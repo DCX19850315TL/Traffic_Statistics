@@ -7,6 +7,14 @@
 <body>
     <h>Index</h>
     <br>
-    <h>Index</h>
+    <table>
+        {% for item in data %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.Hostname }}</td>
+                <td>{{ item.Password }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
