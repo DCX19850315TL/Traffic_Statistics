@@ -9,3 +9,7 @@ class Test(models.Model):
     Hostname = models.CharField(max_length=255)
 
     Password = models.CharField(max_length=255)
+
+class Compute(models.Model):
+
+    Compute = models.CharField(max_length=255)
