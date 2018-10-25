@@ -41,8 +41,8 @@
                             <input type="button" name="remFromGroup" value=" << " onclick="remFromGroup_f()">
                         </td>
                         <td>
-                            <select style="margin-right: 500px" multiple name="host_data_out" size="12">
-                                <option value="0"><-- 选中的主机 --></option>
+                            <select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
+                                <option value="0"><-- 选中的主机 --></option>-->
                             </select>
                         </td>
                     </tr>
@@ -56,8 +56,31 @@
     </div>
 </body>
 <script>
+    function addToGroup_f(data){
+        //var option = $("<option>").text(data);
+        //console.log(option);
+        //var option = $("<option>").text(data).attr({value:data});
+        var option = $("<option>").text(data).attr({value:data});
+        console.log(option);
+        $('#host_data_out_id').append(option);
+    };
     $('#host_data_in_id > option').select(function () {
-        $(this).f
+        var old_data = $(this).text();
+        console.log(old_data);
+        $("input[name='addToGroup']").click(function () {
+            addToGroup_f(old_data);
+            console.log(addToGroup_f(old_data));
+        });
+        //$('#host_data_out_id').addToGroup(old_data,old_data);
+        //console.log(addToGroup_f(old_data,old_data));
+        //console.log(data_in);
+
+        //console.log(data_in);
+        /*var data_in = $(this);
+        var data_out = $('#host_data_out_id');
+        console.log();
+        addToGroup_f(data_in,data_out);
+        console.log;*/
     });
 </script>
 </html>

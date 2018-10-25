@@ -13,3 +13,11 @@ class Test(models.Model):
 class Compute(models.Model):
 
     Compute = models.CharField(max_length=255)
+
+class Step(models.Model):
+
+    Step = models.CharField(max_length=255)
+
+class Operator(models.Model):
+
+    Operator = models.CharField(max_length=255)
