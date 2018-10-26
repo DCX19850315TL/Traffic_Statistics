@@ -12,45 +12,54 @@
     <div>
         <form action="/statistics/handle/" method="post">
             <div style="float: left">
-                <p style="font-weight: bold">起始时间</p>
+                <b style="font-weight: bold">起始时间</b>
                 <input type="datetime-local" step="1" name="start_time">
             </div>
             <div style="float: left;margin-left: 15px;">
-                <p style="font-weight: bold">结束时间</p>
+                <b style="font-weight: bold">结束时间</b>
                 <input type="datetime-local" step="1" name="end_time">
-                <br>
-                &nbsp;
-                <br>
+                <p></p>
             </div>
             <table style="width: 100%" border="0" cellpadding="4" cellspacing="0">
                 <tbody>
                     <tr>
                         <td>
                             <select id="host_data_in_id" multiple name="host_data_in" size="12">
-                                <option value="0"><-- 请选择主机 --></option>
-                                {% for item in data %}
+                                <!--<option value="0">!--- 请选择主机 ---!</option>-->
+                                {% comment %}{% for item in data %}
                                     <option value="{{ item.description }}">{{ item.description }}</option>
-                                {% endfor %}
+                                {% endfor %}{% endcomment %}
                             </select>
                         </td>
                         <td>
                             <input type="button" name="addToGroup" value=" >> " onclick="addToGroup_f()">
-                            <br>
-                            &nbsp;
-                            <br>
+
                             <input type="button" name="remFromGroup" value=" << " onclick="remFromGroup_f()">
                         </td>
                         <td>
                             <select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
-                                <option value="0"><-- 选中的主机 --></option>-->
+                                {% for item in data %}
+                                    <option value="{{ item.description }}">{{ item.description }}</option>
+                                {% endfor %}
                             </select>
+                            <!--<select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
+                                <option value="0">!--- 选中的主机 ---!</option>
+                            </select>-->
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <br>
-            &nbsp;
-            <br>
+            <p></p>
+            <b>运营商:</b>
+                <select id="operator_select" name="operator_data">
+                    <option value="0">--请选择--</option>
+                </select>
+            <p></p>
+            <b>计算方法:</b>
+                <select id="compute_select" name="compute_data">
+                    <option value="0">--请选择--</option>
+                </select>
+            <p></p>
             <input type="submit" value="提交">
         </form>
     </div>
@@ -60,11 +69,11 @@
         //var option = $("<option>").text(data);
         //console.log(option);
         //var option = $("<option>").text(data).attr({value:data});
-        var option = $("<option>").text(data).attr({value:data});
+        var option = $('option').text(data).attr({value:data});
         console.log(option);
         $('#host_data_out_id').append(option);
     };
-    $('#host_data_in_id > option').select(function () {
+    $('#host_data_in_id option').select(function () {
         var old_data = $(this).text();
         console.log(old_data);
         $("input[name='addToGroup']").click(function () {
@@ -81,6 +90,34 @@
         console.log();
         addToGroup_f(data_in,data_out);
         console.log;*/
+    });
+    $.ajax({
+        url:'/statistics/show_operator/',
+        type:'GET',
+        success:function (data) {
+            $('#operator_select').empty();
+            $('#operator_select').append("<option>--请选择--</option>");
+            $.each($.parseJSON(data),function (k,v) {
+                $("#operator_select").append("<option value='"+v.id+"'>"+v.operator+"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
+    });
+    $.ajax({
+        url:'/statistics/show_compute/',
+        type:'GET',
+        success:function (data) {
+            $('#compute_select').empty();
+            $('#compute_select').append("<option>--请选择--</option>");
+            $.each($.parseJSON(data),function (k,v) {
+                $("#compute_select").append("<option value='"+v.id+"'>"+v.compute+"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
     });
 </script>
 </html>
