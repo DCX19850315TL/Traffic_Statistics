@@ -47,13 +47,14 @@ def handle(request):
         conn.close()
 
         operator_type_str = str(operator_type[0]).strip(')').strip('(').strip(',').strip("'").encode('utf-8')
-        operator_type_str1 = "- operator_type_str"
+        operator_type_str1 = "- "+operator_type_str
+        print operator_type_str1
 
         conn = MySQLdb.connect(host='10.160.92.77', port=3306, user='root', passwd='123456', db='cacti')
         cur = conn.cursor()
 
-        sql = 'select data_source_path from data_template_data where name_cache REGEXP "Traffic" and name_cache REGEXP %s'
-        data = cur.execute(sql,operator_type_str)
+        sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(host_str,operator_type_str1)
+        data = cur.execute(sql)
         rrd = cur.fetchall()
 
         cur.close()
