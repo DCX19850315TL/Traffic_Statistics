@@ -37,7 +37,7 @@
                             <input type="button" name="remFromGroup" value=" << " onclick="remFromGroup_f()">
                         </td>
                         <td>
-                            <select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
+                            <select id="host_data_out_id" style="margin-right: 500px" multiple="true" name="host_data_out" size="12">
                                 {% for item in data %}
                                     <option value="{{ item.description }}">{{ item.description }}</option>
                                 {% endfor %}
