@@ -113,35 +113,58 @@ def handle(request):
             fetch_result_list.append(fetch_result)
             #print fetch_result
             #print type(fetch_result)
-        #print fetch_result_list
+        print fetch_result_list
         #print fetch_result_list[0][2]
 
+        # 将None的数据替换为0，将rrdtool算出来的数据做max和average的运算
+        traffic_list = []
+        traffic_list_count = []
         for item in fetch_result_list:
             for items in item[2]:
-                print items
-        '''
-        #将None的数据替换为0，将rrdtool算出来的数据做max和average的运算
-        traffic_list = []
-        for item in fetch_result[2]:
-            if item[0] is None and item[1] is None:
-                traffic = float(0)
-            elif item[0] > item[1]:
-                traffic = item[0]*8
-            elif item[0] < item[1]:
-                traffic = item[1]*8
+                if items[0] is None and items[1] is None:
+                    traffic = float(0)
+                elif items[0] > items[1]:
+                    traffic = items[0]*8
+                elif items[0] < items[1]:
+                    traffic = items[1]*8
+                #else:
+                    #traffic = items[0]*8
+                traffic_list.append(traffic)
+            if compute_type_str == 'MAX':
+                traffic_max = round(max(traffic_list) / float(1024) / float(1024), 2)
+                #print traffic_max
+                traffic_list_count.append(traffic_max)
+                traffic_list = []
+                #print traffic_list_count
+                #print sum(traffic_list_count)
+            elif compute_type_str == 'AVERAGE':
+                traffic_sum = sum(traffic_list)
+                traffic_list_len = float(len(traffic_list))
+                traffic_average = round(traffic_sum / traffic_list_len / float(1024) / float(1024), 2)
+                traffic_list_count.append(traffic_average)
+                traffic_list = []
             else:
-                traffic = item[0]*8
-            traffic_list.append(traffic)
-        print traffic_list
-        traffic_max = round(max(traffic_list) / float(1024) / float(1024),2)
-        print traffic_max
+                print '请选择计算方法'
+        print sum(traffic_list_count)
+        #print sum(traffic_list_count)
+            #print traffic_list
+            #print type(traffic_list)
+                #traffic_list_count.append(traffic_list_one)
+            #traffic_list = []
+        #print traffic_list
+        #print traffic_list_count
+        #traffic_max = round(max(traffic_list) / float(1024) / float(1024), 2)
+        #print traffic_max
+        '''
         traffic_sum = sum(traffic_list)
         traffic_list_len = float(len(traffic_list))
-        traffic_average = round(traffic_sum / traffic_list_len / float(1024) / float(1024),2)
+        traffic_average = round(traffic_sum / traffic_list_len / float(1024) / float(1024), 2)
         print traffic_sum
         print traffic_list_len
         print traffic_average
         '''
+        #print traffic_list
+
     return HttpResponse('aaa')
 
 #用于ajax查询运营商数据在前端页面显示
