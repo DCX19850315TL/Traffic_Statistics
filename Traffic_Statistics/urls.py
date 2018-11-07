@@ -15,12 +15,21 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
-from statistics.views import index,handle,show_operator,show_compute
+from statistics.views import index,handle,show_operator,show_compute,show_area,show_service_line
+from statistics.views import handle_api
+from get_data_display.views import get_operator_data,get_operator_month_count
+from get_data_display.views import get_operator_api_data
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'index/',index),
-    url(r'handle/',handle),
-    url(r'show_operator/',show_operator),
-    url(r'show_compute/',show_compute)
+    url(r'^index/',index),
+    url(r'^handle/',handle),
+    url(r'^show_operator/',show_operator),
+    url(r'^show_compute/',show_compute),
+    url(r'^show_area/',show_area),
+    url(r'^show_service_line/',show_service_line),
+    url(r'^handle_api/date(.+)host(.+)operator(\w+)compute(\w+)area(\w+)/$',handle_api),
+    url(r'^get_operator_data/',get_operator_data),
+    url(r'^get_operator_api_data/',get_operator_api_data),
+    url(r'^get_operator_month_count/',get_operator_month_count),
 ]

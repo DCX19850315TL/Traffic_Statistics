@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'statistics'
+    'statistics',
+    'get_data_display'
 ]
 
 MIDDLEWARE = [
@@ -81,7 +82,7 @@ DATABASES = {
     'NAME':'cacti',
     'USER': 'root',
     'PASSWORD': '123456',
-    'HOST': '10.160.92.77',
+    'HOST': '192.168.137.1',
     'PORT': '3306',
     'OPTIONS':{
         'init_command':"SET sql_mode='STRICT_TRANS_TABLES'",

@@ -3,14 +3,14 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>index</title>
-    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="../static/js/jquery-1.12.4.min.js"></script>
 </head>
 <body>
     <div style="text-align: center">
         <h1 style="font-size: 20px;font-weight: bold">流量统计页面</h1>
     </div>
     <div>
-        <form action="/statistics/handle/" method="post">
+        <form action="/handle/" method="post">
             <div style="float: left">
                 <b style="font-weight: bold">起始时间</b>
                 <input type="datetime-local" step="1" name="start_time">
@@ -52,16 +52,27 @@
             <p></p>
             <b>运营商:</b>
                 <select id="operator_select" name="operator_data">
-                    <option value="0">--请选择--</option>
+                    <option value="0">selected</option>
                 </select>
             <p></p>
             <b>计算方法:</b>
                 <select id="compute_select" name="compute_data">
-                    <option value="0">--请选择--</option>
+                    <option value="0">selected</option>
+                </select>
+            <p></p>
+            <b>区域:</b>
+                <select id="area_select" name="area_data">
+                    <option value="0">selected</option>
+                </select>
+            <p></p>
+            <b>业务线:</b>
+                <select id="service_line_select" name="service_line_data">
+                    <option value="0">selected</option>
                 </select>
             <p></p>
             <input type="submit" value="提交">
         </form>
+    <div><a href="http://192.168.137.2:9000/get_operator_month_count/">查看运营商月流量统计</a></div>
     </div>
 </body>
 <script>
@@ -92,11 +103,11 @@
         console.log;*/
     });
     $.ajax({
-        url:'/statistics/show_operator/',
+        url:'/show_operator/',
         type:'GET',
         success:function (data) {
             $('#operator_select').empty();
-            $('#operator_select').append("<option>--请选择--</option>");
+            $('#operator_select').append("<option>selected</option>");
             $.each($.parseJSON(data),function (k,v) {
                 $("#operator_select").append("<option value='"+v.id+"'>"+v.operator+"</option>");
             });
@@ -106,13 +117,42 @@
         },
     });
     $.ajax({
-        url:'/statistics/show_compute/',
+        url:'/show_compute/',
         type:'GET',
         success:function (data) {
             $('#compute_select').empty();
-            $('#compute_select').append("<option>--请选择--</option>");
+            $('#compute_select').append("<option>selected</option>");
             $.each($.parseJSON(data),function (k,v) {
                 $("#compute_select").append("<option value='"+v.id+"'>"+v.compute+"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
+    });
+    $.ajax({
+        url:'/show_area/',
+        type:'GET',
+        success:function (data) {
+            $('#area_select').empty();
+            $('#area_select').append("<option>selected</option>");
+            $.each($.parseJSON(data),function (k,v) {
+                $("#area_select").append("<option value='"+v.id+"'>"+v.area+"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
+    });
+    $.ajax({
+        url:'/show_service_line/',
+        type:'GET',
+        scriptCharset:'utf-8',
+        success:function (data) {
+            $('#service_line_select').empty();
+            $('#service_line_select').append("<option>selected</option>");
+            $.each($.parseJSON(data),function (k,v) {
+                $("#service_line_select").append("<option value='"+v.id+"'>"+v.service_line+"</option>");
             });
         },
         error:function () {
