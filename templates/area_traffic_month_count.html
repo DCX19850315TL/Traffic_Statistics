@@ -1,10 +1,475 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Title</title>
-</head>
-<body>
+    <head>
+        <meta charset="utf-8"><link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>按月统计区域流量数据</title>
+        <!--<style>
+            /* css 代码  */
+        </style>-->
+        <script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+        <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+        <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+        <script src="../../static/js/jquery-1.12.4.min.js"></script>
+    </head>
+    <body>
+        <div id="container_BGP" style="min-width:400px;height:400px"></div>
+        <div id="container_LT" style="min-width:400px;height:400px"></div>
+        <div id="container_DX" style="min-width:400px;height:400px"></div>
+        <div id="container_YD" style="min-width:400px;height:400px"></div>
+        <script>
+            $(function () {
+                $.ajax({
+                url:'/get_area_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var month_data = JSON.parse(data).month;
+                    var BJ_max_data = JSON.parse(data).BJ_BGP_max_value;
+                    var BJ_average_data = JSON.parse(data).BJ_BGP_average_value;
+                    var SH_max_data = JSON.parse(data).SH_BGP_max_value;
+                    var SH_average_data = JSON.parse(data).SH_BGP_average_value;
+                    var GZ_max_data = JSON.parse(data).GZ_BGP_max_value;
+                    var GZ_average_data = JSON.parse(data).GZ_BGP_average_value;
+                    console.log(month_data);
+                    var chart = Highcharts.chart('container_BGP', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: '北上广BGP带宽峰值/均值使用情况'
+                        },
+                        xAxis: {
+                            categories: month_data
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: '带宽使用情况,单位Mbit'
+                            },
+                            stackLabels: {  // 堆叠数据标签
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                }
+                            }
+                        },
+                        //图例
+                        legend: {
+                            align: 'right',
+                            x: -30,
+                            verticalAlign: 'top',
+                            y: 15,
+                            floating: true,
+                            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                            borderColor: '#CCC',
+                            borderWidth: 1,
+                            shadow: false
+                        },
+                        //柱状图竖着堆叠
+                        plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                dataLabels: {
+                                    enabled: true,
+                                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                    style: {
+                                        // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                        textOutline: '1px 1px black'
+                                    }
+                                }
+                            }
+                        },
+                        //数据列
+                        series: [{
+                            name: '北京峰值',
+                            data: BJ_max_data,
+                            stack: 'BJ'
+                        }, {
+                            name: '北京均值',
+                            data: BJ_average_data,
+                            stack: 'BJ'
+                        }, {
+                            name: '上海峰值',
+                            data: SH_max_data,
+                            stack: 'SH'
+                        }, {
+                            name: '上海均值',
+                            data: SH_average_data,
+                            stack: 'SH'
+                        }, {
+                            name: '广州峰值',
+                            data: GZ_max_data,
+                            stack: 'GZ'
+                        }, {
+                            name: '广州均值',
+                            data: GZ_average_data,
+                            stack: 'GZ'
+                        }]
+                    });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_area_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var last_month_data = JSON.parse(data).last_month;
+                    var BJ_LT_max_data = JSON.parse(data).BJ_LT_max_value;
+                    var BJ_LT_average_data = JSON.parse(data).BJ_LT_average_value;
+                    var SH_LT_max_data = JSON.parse(data).SH_LT_max_value;
+                    var SH_LT_average_data = JSON.parse(data).SH_LT_average_value;
+                    var GZ_LT_max_data = JSON.parse(data).GZ_LT_max_value;
+                    var GZ_LT_average_data = JSON.parse(data).GZ_LT_average_value;
+                    var XA_LT_max_data = JSON.parse(data).XA_LT_max_value;
+                    var XA_LT_average_data = JSON.parse(data).XA_LT_average_value;
+                    var WH_LT_max_data = JSON.parse(data).WH_LT_max_value;
+                    var WH_LT_average_data = JSON.parse(data).WH_LT_average_value;
+                    var YZ_LT_max_data = JSON.parse(data).YZ_LT_max_value;
+                    var YZ_LT_average_data = JSON.parse(data).YZ_LT_average_value;
+                    var YF_LT_max_data = JSON.parse(data).YF_LT_max_value;
+                    var YF_LT_average_data = JSON.parse(data).YF_LT_average_value;
 
-</body>
+                    var chart = Highcharts.chart('container_LT', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: '各个区域联通带宽峰值/均值使用情况'
+                        },
+                        xAxis: {
+                            categories: [last_month_data]
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: '带宽使用情况,单位Mbit'
+                            },
+                            stackLabels: {  // 堆叠数据标签
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                }
+                            }
+                        },
+                        //图例
+                        legend: {
+                            align: 'right',
+                            x: -30,
+                            verticalAlign: 'top',
+                            y: 15,
+                            floating: true,
+                            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                            borderColor: '#CCC',
+                            borderWidth: 1,
+                            shadow: false
+                        },
+                        //柱状图竖着堆叠
+                        plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                dataLabels: {
+                                    enabled: true,
+                                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                    style: {
+                                        // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                        textOutline: '1px 1px black'
+                                    }
+                                }
+                            }
+                        },
+                        //数据列
+                        series: [{
+                            name: '北京峰值',
+                            data: BJ_LT_max_data,
+                            stack: 'BJ'
+                        }, {
+                            name: '北京均值',
+                            data: BJ_LT_average_data,
+                            stack: 'BJ'
+                        }, {
+                            name: '上海峰值',
+                            data: SH_LT_max_data,
+                            stack: 'SH'
+                        }, {
+                            name: '上海均值',
+                            data: SH_LT_average_data,
+                            stack: 'SH'
+                        }, {
+                            name: '广州峰值',
+                            data: GZ_LT_max_data,
+                            stack: 'GZ'
+                        }, {
+                            name: '广州均值',
+                            data: GZ_LT_average_data,
+                            stack: 'GZ'
+                        }, {
+                            name: '西安峰值',
+                            data: XA_LT_max_data,
+                            stack: 'XA'
+                        }, {
+                            name: '西安均值',
+                            data: XA_LT_average_data,
+                            stack: 'XA'
+                        }, {
+                            name: '武汉峰值',
+                            data: WH_LT_max_data,
+                            stack: 'WH'
+                        }, {
+                            name: '武汉均值',
+                            data: WH_LT_average_data,
+                            stack: 'WH'
+                        }, {
+                            name: '扬州峰值',
+                            data: YZ_LT_max_data,
+                            stack: 'YZ'
+                        }, {
+                            name: '扬州均值',
+                            data: YZ_LT_average_data,
+                            stack: 'YZ'
+                        }, {
+                            name: '永丰峰值',
+                            data: YF_LT_max_data,
+                            stack: 'YF'
+                        }, {
+                            name: '永丰均值',
+                            data: YF_LT_average_data,
+                            stack: 'YF'
+                        }]
+                    });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_area_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var last_month_data = JSON.parse(data).last_month;
+                    var BJ_DX_max_data = JSON.parse(data).BJ_DX_max_value;
+                    var BJ_DX_average_data = JSON.parse(data).BJ_DX_average_value;
+                    var SH_DX_max_data = JSON.parse(data).SH_DX_max_value;
+                    var SH_DX_average_data = JSON.parse(data).SH_DX_average_value;
+                    var GZ_DX_max_data = JSON.parse(data).GZ_DX_max_value;
+                    var GZ_DX_average_data = JSON.parse(data).GZ_DX_average_value;
+                    var XA_DX_max_data = JSON.parse(data).XA_DX_max_value;
+                    var XA_DX_average_data = JSON.parse(data).XA_DX_average_value;
+                    var WH_DX_max_data = JSON.parse(data).WH_DX_max_value;
+                    var WH_DX_average_data = JSON.parse(data).WH_DX_average_value;
+                    var YZ_DX_max_data = JSON.parse(data).YZ_DX_max_value;
+                    var YZ_DX_average_data = JSON.parse(data).YZ_DX_average_value;
+                    var YF_DX_max_data = JSON.parse(data).YF_DX_max_value;
+                    var YF_DX_average_data = JSON.parse(data).YF_DX_average_value;
+
+                    var chart = Highcharts.chart('container_DX', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: '各个区域电信带宽峰值/均值使用情况'
+                        },
+                        xAxis: {
+                            categories: [last_month_data]
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: '带宽使用情况,单位Mbit'
+                            },
+                            stackLabels: {  // 堆叠数据标签
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                }
+                            }
+                        },
+                        //图例
+                        legend: {
+                            align: 'right',
+                            x: -30,
+                            verticalAlign: 'top',
+                            y: 15,
+                            floating: true,
+                            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                            borderColor: '#CCC',
+                            borderWidth: 1,
+                            shadow: false
+                        },
+                        //柱状图竖着堆叠
+                        plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                dataLabels: {
+                                    enabled: true,
+                                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                    style: {
+                                        // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                        textOutline: '1px 1px black'
+                                    }
+                                }
+                            }
+                        },
+                        //数据列
+                        series: [{
+                            name: '北京峰值',
+                            data: BJ_DX_max_data,
+                            stack: 'BJ'
+                        }, {
+                            name: '北京均值',
+                            data: BJ_DX_average_data,
+                            stack: 'BJ'
+                        }, {
+                            name: '上海峰值',
+                            data: SH_DX_max_data,
+                            stack: 'SH'
+                        }, {
+                            name: '上海均值',
+                            data: SH_DX_average_data,
+                            stack: 'SH'
+                        }, {
+                            name: '广州峰值',
+                            data: GZ_DX_max_data,
+                            stack: 'GZ'
+                        }, {
+                            name: '广州均值',
+                            data: GZ_DX_average_data,
+                            stack: 'GZ'
+                        }, {
+                            name: '西安峰值',
+                            data: XA_DX_max_data,
+                            stack: 'XA'
+                        }, {
+                            name: '西安均值',
+                            data: XA_DX_average_data,
+                            stack: 'XA'
+                        }, {
+                            name: '武汉峰值',
+                            data: WH_DX_max_data,
+                            stack: 'WH'
+                        }, {
+                            name: '武汉均值',
+                            data: WH_DX_average_data,
+                            stack: 'WH'
+                        }, {
+                            name: '扬州峰值',
+                            data: YZ_DX_max_data,
+                            stack: 'YZ'
+                        }, {
+                            name: '扬州均值',
+                            data: YZ_DX_average_data,
+                            stack: 'YZ'
+                        }, {
+                            name: '永丰峰值',
+                            data: YF_DX_max_data,
+                            stack: 'YF'
+                        }, {
+                            name: '永丰均值',
+                            data: YF_DX_average_data,
+                            stack: 'YF'
+                        }]
+                    });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_area_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var last_month_data = JSON.parse(data).last_month;
+                    var YZ_YD_max_data = JSON.parse(data).YZ_YD_max_value;
+                    var YZ_YD_average_data = JSON.parse(data).YZ_YD_average_value;
+                    var YF_YD_max_data = JSON.parse(data).YF_YD_max_value;
+                    var YF_YD_average_data = JSON.parse(data).YF_YD_average_value;
+
+                    var chart = Highcharts.chart('container_YD', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: '各个区域移动带宽峰值/均值使用情况'
+                        },
+                        xAxis: {
+                            categories: [last_month_data]
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: '带宽使用情况,单位Mbit'
+                            },
+                            stackLabels: {  // 堆叠数据标签
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                }
+                            }
+                        },
+                        //图例
+                        legend: {
+                            align: 'right',
+                            x: -30,
+                            verticalAlign: 'top',
+                            y: 15,
+                            floating: true,
+                            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                            borderColor: '#CCC',
+                            borderWidth: 1,
+                            shadow: false
+                        },
+                        //柱状图竖着堆叠
+                        plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                dataLabels: {
+                                    enabled: true,
+                                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                    style: {
+                                        // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                        textOutline: '1px 1px black'
+                                    }
+                                }
+                            }
+                        },
+                        //数据列
+                        series: [{
+                            name: '扬州峰值',
+                            data: YZ_YD_max_data,
+                            stack: 'YZ'
+                        }, {
+                            name: '扬州均值',
+                            data: YZ_YD_average_data,
+                            stack: 'YZ'
+                        }, {
+                            name: '永丰峰值',
+                            data: YF_YD_max_data,
+                            stack: 'YF'
+                        }, {
+                            name: '永丰均值',
+                            data: YF_YD_average_data,
+                            stack: 'YF'
+                        }]
+                    });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+            });
+        </script>
+    </body>
 </html>

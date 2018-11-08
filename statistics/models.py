@@ -71,6 +71,7 @@ class Operator_month_count(models.Model):
     average_value = models.FloatField(default=None, blank=True)
     create_time = models.DateTimeField(auto_now_add=True)
     update_time = models.DateTimeField(auto_now=True)
+    comment = models.CharField(max_length=255,default=None)
 
 class Area_month_count(models.Model):
 

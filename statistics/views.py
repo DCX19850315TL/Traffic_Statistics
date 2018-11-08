@@ -363,6 +363,7 @@ def show_service_line(request):
 
     return HttpResponse(json.dumps(all_data))
 
+#存储运营商月统计的流量数据
 def handle_api(request,date,host,operator,compute,area):
 
     print date,host,operator,compute,area
@@ -394,6 +395,7 @@ def handle_api(request,date,host,operator,compute,area):
     end_timestamp = str(int(time.mktime(end_timestamp)))
     host_list = host.split('+')
     operator_1 = '- '+operator.encode('utf-8')
+    area_s = area.encode('utf-8')
 
     rrd_file_list = []
     for item in host_list:
@@ -463,6 +465,112 @@ def handle_api(request,date,host,operator,compute,area):
 
     traffic_list_count_AVERAGE_sum = sum(traffic_list_count_AVERAGE)
 
-    models.Operator_month_count.objects.create(operator=operator.encode('utf-8'),month=year_s+'/'+month_s,max_value=traffic_list_count_MAX_sum,average_value=traffic_list_count_AVERAGE_sum)
+    models.Operator_month_count.objects.create(operator=operator.encode('utf-8'),month=year_s+'/'+month_s,max_value=traffic_list_count_MAX_sum,average_value=traffic_list_count_AVERAGE_sum,comment=area_s)
+
+    return HttpResponse('ok')
+
+#存储区域月统计的流量数据
+def handle_area_api(request,date,host,operator,compute,area):
+
+    print date,host,operator,compute,area
+
+    start_time_h = "00:00:00"
+    end_time_h = "23:59:59"
+    da = [1,3,5,7,8,10,12]
+    xiao = [4,6,9,11]
+    month_s = str(date.split('-')[1:]).strip('[]').strip("u").strip("'").encode('utf-8')
+    year_s = str(date.split('-')[:1]).strip('[]').strip("u").strip("'").encode('utf-8')
+    print year_s
+    print month_s
+    if month_s.startswith('0'):
+        month_s = month_s[1:]
+    if int(month_s) in da:
+        day_s = '31'
+    elif int(month_s) in xiao:
+        day_s = '30'
+    else:
+        if int(year_s) % 400 == 0 or (int(year_s) % 4 == 0 and int(year_s) % 100 != 0):
+            day_s = '29'
+        else:
+            day_s = '28'
+    start_time = year_s+'-'+month_s+'-'+'1'+' '+start_time_h
+    end_time = year_s+'-'+month_s+'-'+day_s+' '+end_time_h
+    start_timestamp = time.strptime(start_time,"%Y-%m-%d %H:%M:%S")
+    start_timestamp = str(int(time.mktime(start_timestamp)))
+    end_timestamp = time.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    end_timestamp = str(int(time.mktime(end_timestamp)))
+    host_list = host.split('+')
+    operator_1 = '- '+operator.encode('utf-8')
+    area_s = area.encode('utf-8')
+
+    rrd_file_list = []
+    for item in host_list:
+        item_str = item.encode('utf-8')
+
+        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        cur = conn.cursor()
+
+        sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
+            item_str, operator_1)
+        data = cur.execute(sql)
+        rrd = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+        rrd = rrd.__str__()
+        rrd_file_path = rrd.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
+            ')').strip(',').strip("'").encode('utf-8')
+        rrd_file_list.append(rrd_file_path)
+
+    fetch_result_list_max = []
+    fetch_result_list_average = []
+    for item in rrd_file_list:
+        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_list_max.append(fetch_result_max)
+        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_list_average.append(fetch_result_average)
+
+    traffic_list_MAX = []
+    traffic_list_AVERAGE = []
+    traffic_list_count_MAX = []
+    traffic_list_count_AVERAGE = []
+    for item in fetch_result_list_max:
+        for items in item[2]:
+            if items[0] is None and items[1] is None:
+                traffic = float(0)
+            elif items[0] > items[1]:
+                traffic = items[0] * 8
+            elif items[0] < items[1]:
+                traffic = items[1] * 8
+            else:
+                traffic = items[0] * 8
+            traffic_list_MAX.append(traffic)
+        traffic_max = round(max(traffic_list_MAX) / float(1024) / float(1024), 2)
+        traffic_list_count_MAX.append(traffic_max)
+        traffic_list_MAX = []
+
+    traffic_list_count_MAX_sum = sum(traffic_list_count_MAX)
+
+    for item in fetch_result_list_average:
+        for items in item[2]:
+            if items[0] is None and items[1] is None:
+                traffic = float(0)
+            elif items[0] > items[1]:
+                traffic = items[0] * 8
+            elif items[0] < items[1]:
+                traffic = items[1] * 8
+            else:
+                traffic = items[0] * 8
+            traffic_list_AVERAGE.append(traffic)
+        traffic_sum = sum(traffic_list_AVERAGE)
+        traffic_list_len = float(len(traffic_list_AVERAGE))
+        traffic_average = round(traffic_sum / traffic_list_len / float(1024) / float(1024), 2)
+        traffic_list_count_AVERAGE.append(traffic_average)
+        traffic_list_AVERAGE = []
+
+    traffic_list_count_AVERAGE_sum = sum(traffic_list_count_AVERAGE)
+
+    models.Area_month_count.objects.create(area=area_s,operator=operator.encode('utf-8'),month=year_s+'/'+month_s,max_value=traffic_list_count_MAX_sum,average_value=traffic_list_count_AVERAGE_sum)
 
     return HttpResponse('ok')

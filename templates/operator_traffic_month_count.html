@@ -13,7 +13,10 @@
         <script src="../../static/js/jquery-1.12.4.min.js"></script>
     </head>
     <body>
-        <div id="container" style="min-width:400px;height:400px"></div>
+        <div id="container_BGP" style="min-width:400px;height:400px"></div>
+        <div id="container_LT" style="min-width:400px;height:400px"></div>
+        <div id="container_DX" style="min-width:400px;height:400px"></div>
+        <div id="container_YD" style="min-width:400px;height:400px"></div>
         <script>
             $(function () {
                 $.ajax({
@@ -23,12 +26,12 @@
                 success:function(data) {
                     console.log(data);
                     var month_data = JSON.parse(data).month;
-                    var max_data = JSON.parse(data).max_value;
-                    var average_data = JSON.parse(data).average_value;
-                    console.log(typeof month_data);
-                    console.log(typeof max_data);
-                    console.log(typeof average_data);
-                    var chart = Highcharts.chart('container', {
+                    var max_data = JSON.parse(data).BGP_max_value;
+                    var average_data = JSON.parse(data).BGP_average_value;
+                    console.log(month_data);
+                    console.log(max_data);
+                    console.log(average_data);
+                    var chart = Highcharts.chart('container_BGP', {
                     chart: {
                         type: 'column'
                     },
@@ -36,7 +39,7 @@
                         text: 'BGP带宽总共峰值/均值使用情况'
                     },
                     xAxis: {
-                        categories: [month_data]
+                        categories: month_data
                     },
                     yAxis: {
                         min: 0,
@@ -80,10 +83,244 @@
                     //数据列
                     series: [{
                         name: '峰值',
-                        data: [max_data]
+                        data: max_data
                     }, {
                         name: '均值',
-                        data: [average_data]
+                        data: average_data
+                    }]
+                });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_operator_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var month_data = JSON.parse(data).month;
+                    var max_data = JSON.parse(data).LT_max_value;
+                    var average_data = JSON.parse(data).LT_average_value;
+                    console.log(month_data);
+                    console.log(max_data);
+                    console.log(average_data);
+                    var chart = Highcharts.chart('container_LT', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: '联通带宽总共峰值/均值使用情况'
+                    },
+                    xAxis: {
+                        categories: month_data
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: '带宽使用情况,单位Mbit'
+                        },
+                        stackLabels: {  // 堆叠数据标签
+                            enabled: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                            }
+                        }
+                    },
+                    //图例
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    //柱状图竖着堆叠
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                style: {
+                                    // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                    textOutline: '1px 1px black'
+                                }
+                            }
+                        }
+                    },
+                    //数据列
+                    series: [{
+                        name: '峰值',
+                        data: max_data
+                    }, {
+                        name: '均值',
+                        data: average_data
+                    }]
+                });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_operator_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var month_data = JSON.parse(data).month;
+                    var max_data = JSON.parse(data).DX_max_value;
+                    var average_data = JSON.parse(data).DX_average_value;
+                    console.log(month_data);
+                    console.log(max_data);
+                    console.log(average_data);
+                    var chart = Highcharts.chart('container_DX', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: '电信带宽总共峰值/均值使用情况'
+                    },
+                    xAxis: {
+                        categories: month_data
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: '带宽使用情况,单位Mbit'
+                        },
+                        stackLabels: {  // 堆叠数据标签
+                            enabled: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                            }
+                        }
+                    },
+                    //图例
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    //柱状图竖着堆叠
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                style: {
+                                    // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                    textOutline: '1px 1px black'
+                                }
+                            }
+                        }
+                    },
+                    //数据列
+                    series: [{
+                        name: '峰值',
+                        data: max_data
+                    }, {
+                        name: '均值',
+                        data: average_data
+                    }]
+                });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_operator_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var month_data = JSON.parse(data).month;
+                    var YZ_max_data = JSON.parse(data).YD_YZ_max_value;
+                    var YZ_average_data = JSON.parse(data).YD_YZ_average_value;
+                    var YF_max_data = JSON.parse(data).YD_YF_max_value;
+                    var YF_average_data = JSON.parse(data).YD_YF_average_value;
+                    var chart = Highcharts.chart('container_YD', {
+                    chart: {
+                        type: 'column'
+                    },
+                    title: {
+                        text: '移动带宽总共峰值/均值使用情况'
+                    },
+                    xAxis: {
+                        categories: month_data
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: '带宽使用情况,单位Mbit'
+                        },
+                        stackLabels: {  // 堆叠数据标签
+                            enabled: true,
+                            style: {
+                                fontWeight: 'bold',
+                                color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                            }
+                        }
+                    },
+                    //图例
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    //柱状图竖着堆叠
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                style: {
+                                    // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                    textOutline: '1px 1px black'
+                                }
+                            }
+                        }
+                    },
+                    //数据列
+                    series: [{
+                        name: '扬州峰值',
+                        data: YZ_max_data,
+                        stack: 'YZ'
+                    }, {
+                        name: '扬州均值',
+                        data: YZ_average_data,
+                        stack: 'YZ'
+                    }, {
+                        name: '永丰峰值',
+                        data: YF_max_data,
+                        stack: 'YF'
+                    }, {
+                        name: '永丰均值',
+                        data: YF_average_data,
+                        stack: 'YF'
                     }]
                 });
                 },
