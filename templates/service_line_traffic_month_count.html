@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"><link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>按月统计业务线流量数据</title>
+        <!--<style>
+            /* css 代码  */
+        </style>-->
+        <script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+        <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+        <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+        <script src="../../static/js/jquery-1.12.4.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <div id="container_BGP_max" style="min-width:400px;height:400px;float: left;margin-left: 200px"></div>
+            <div id="container_BGP_average" style="min-width:400px;height:400px;float: right;margin-right: 200px"></div>
+        </div>
+        <div>
+            <div id="container_LT_max" style="min-width:400px;height:400px;float: left;margin-left: 200px"></div>
+            <div id="container_LT_average" style="min-width:400px;height:400px;float: right;margin-right: 200px"></div>
+        </div>
+        <div>
+            <div id="container_DX_max" style="min-width:400px;height:400px;float: left;margin-left: 200px"></div>
+            <div id="container_DX_average" style="min-width:400px;height:400px;float: right;margin-right: 200px"></div>
+        </div>
+        <div>
+            <div id="container_YD_max" style="min-width:400px;height:400px;float: left;margin-left: 200px"></div>
+            <div id="container_YD_average" style="min-width:400px;height:400px;float: right;margin-right: 200px"></div>
+        </div>
+        <script>
+            $(function () {
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_BGP_data = JSON.parse(data).BGP_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var BGP_ptop_max_percent = JSON.parse(data).BGP_ptop_max_percent;
+                    var BGP_meeting_max_percent = JSON.parse(data).BGP_meeting_max_percent;
+                    var BGP_cdn_max_percent = JSON.parse(data).BGP_cdn_max_percent;
+                    var BGP_test_max_percent = JSON.parse(data).BGP_test_max_percent;
+                    var BGP_usercenter_max_percent = JSON.parse(data).BGP_usercenter_max_percent;
+                    if (return_BGP_data == 'null'){
+                        $("#container_BGP_max").html('BGP max data is null')
+                    }else {
+                        Highcharts.chart('container_BGP_max', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线BGP峰值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: BGP_ptop_max_percent
+                                }, {
+                                    name: '极会议',
+                                    y: BGP_meeting_max_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: BGP_cdn_max_percent
+                                }, {
+                                    name: '测试',
+                                    y: BGP_test_max_percent
+                                }, {
+                                    name: '用户中心',
+                                    y: BGP_usercenter_max_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_BGP_data = JSON.parse(data).BGP_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var BGP_ptop_average_percent = JSON.parse(data).BGP_ptop_average_percent;
+                    var BGP_meeting_average_percent = JSON.parse(data).BGP_meeting_average_percent;
+                    var BGP_cdn_average_percent = JSON.parse(data).BGP_cdn_average_percent;
+                    var BGP_test_average_percent = JSON.parse(data).BGP_test_average_percent;
+                    var BGP_usercenter_average_percent = JSON.parse(data).BGP_usercenter_average_percent;
+                    if (return_BGP_data == 'null'){
+                        $("#container_BGP_average").html('BGP average data is null')
+                    }else{
+                        Highcharts.chart('container_BGP_average', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线BGP均值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: BGP_ptop_average_percent
+                                }, {
+                                    name: '极会议',
+                                    y: BGP_meeting_average_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: BGP_cdn_average_percent
+                                }, {
+                                    name: '测试',
+                                    y: BGP_test_average_percent
+                                }, {
+                                    name: '用户中心',
+                                    y: BGP_usercenter_average_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_LT_data = JSON.parse(data).LT_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var LT_ptop_max_percent = JSON.parse(data).LT_ptop_max_percent;
+                    var LT_meeting_max_percent = JSON.parse(data).LT_meeting_max_percent;
+                    var LT_cdn_max_percent = JSON.parse(data).LT_cdn_max_percent;
+                    var LT_test_max_percent = JSON.parse(data).LT_test_max_percent;
+                    var LT_usercenter_max_percent = JSON.parse(data).LT_usercenter_max_percent;
+                    if (return_LT_data == 'null'){
+                        $("#container_LT_max").html('LT max data is null')
+                    }else{
+                        Highcharts.chart('container_LT_max', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线联通峰值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: LT_ptop_max_percent
+                                }, {
+                                    name: '极会议',
+                                    y: LT_meeting_max_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: LT_cdn_max_percent
+                                }, {
+                                    name: '测试',
+                                    y: LT_test_max_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_LT_data = JSON.parse(data).LT_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var LT_ptop_average_percent = JSON.parse(data).LT_ptop_average_percent;
+                    var LT_meeting_average_percent = JSON.parse(data).LT_meeting_average_percent;
+                    var LT_cdn_average_percent = JSON.parse(data).LT_cdn_average_percent;
+                    var LT_test_average_percent = JSON.parse(data).LT_test_average_percent;
+                    var LT_usercenter_average_percent = JSON.parse(data).LT_usercenter_average_percent;
+                    if (return_LT_data == 'null'){
+                        $("#container_LT_average").html('LT average data is null')
+                    }else{
+                        Highcharts.chart('container_LT_average', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线联通均值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: LT_ptop_average_percent
+                                }, {
+                                    name: '极会议',
+                                    y: LT_meeting_average_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: LT_cdn_average_percent
+                                }, {
+                                    name: '测试',
+                                    y: LT_test_average_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_DX_data = JSON.parse(data).DX_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var DX_ptop_max_percent = JSON.parse(data).DX_ptop_max_percent;
+                    var DX_meeting_max_percent = JSON.parse(data).DX_meeting_max_percent;
+                    var DX_cdn_max_percent = JSON.parse(data).DX_cdn_max_percent;
+                    var DX_test_max_percent = JSON.parse(data).DX_test_max_percent;
+                    var DX_usercenter_max_percent = JSON.parse(data).DX_usercenter_max_percent;
+                    if (return_DX_data == 'null'){
+                        $("#container_DX_max").html('DX max data is null')
+                    }else{
+                        Highcharts.chart('container_DX_max', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线电信峰值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: DX_ptop_max_percent
+                                }, {
+                                    name: '极会议',
+                                    y: DX_meeting_max_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: DX_cdn_max_percent
+                                }, {
+                                    name: '测试',
+                                    y: DX_test_max_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_DX_data = JSON.parse(data).DX_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var DX_ptop_average_percent = JSON.parse(data).DX_ptop_average_percent;
+                    var DX_meeting_average_percent = JSON.parse(data).DX_meeting_average_percent;
+                    var DX_cdn_average_percent = JSON.parse(data).DX_cdn_average_percent;
+                    var DX_test_average_percent = JSON.parse(data).DX_test_average_percent;
+                    var DX_usercenter_average_percent = JSON.parse(data).DX_usercenter_average_percent;
+                    if (return_DX_data == 'null'){
+                        $("#container_DX_average").html('DX average data is null')
+                    }else{
+                        Highcharts.chart('container_DX_average', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线电信均值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: DX_ptop_average_percent
+                                }, {
+                                    name: '极会议',
+                                    y: DX_meeting_average_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: DX_cdn_average_percent
+                                }, {
+                                    name: '测试',
+                                    y: DX_test_average_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_YD_data = JSON.parse(data).YD_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var YD_ptop_max_percent = JSON.parse(data).YD_ptop_max_percent;
+                    var YD_meeting_max_percent = JSON.parse(data).YD_meeting_max_percent;
+                    var YD_cdn_max_percent = JSON.parse(data).YD_cdn_max_percent;
+                    var YD_test_max_percent = JSON.parse(data).YD_test_max_percent;
+                    var YD_usercenter_max_percent = JSON.parse(data).YD_usercenter_max_percent;
+                    if (return_YD_data == 'null'){
+                        $("#container_YD_max").html('YD max data is null')
+                    }else{
+                        Highcharts.chart('container_YD_max', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线移动峰值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: YD_ptop_max_percent
+                                }, {
+                                    name: '极会议',
+                                    y: YD_meeting_max_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: YD_cdn_max_percent
+                                }, {
+                                    name: '测试',
+                                    y: YD_test_max_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+                $.ajax({
+                url:'/get_service_line_api_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    var return_YD_data = JSON.parse(data).YD_data;
+                    var last_month_data = JSON.parse(data).last_month;
+                    var YD_ptop_average_percent = JSON.parse(data).YD_ptop_average_percent;
+                    var YD_meeting_average_percent = JSON.parse(data).YD_meeting_average_percent;
+                    var YD_cdn_average_percent = JSON.parse(data).YD_cdn_average_percent;
+                    var YD_test_average_percent = JSON.parse(data).YD_test_average_percent;
+                    var YD_usercenter_average_percent = JSON.parse(data).YD_usercenter_average_percent;
+                    if (return_YD_data == 'null'){
+                        $("#container_YD_average").html('YD average data is null')
+                    }else{
+                        Highcharts.chart('container_YD_average', {
+                            chart: {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false,
+                                type: 'pie'
+                            },
+                            title: {
+                                text: [last_month_data]
+                            },
+                            subtitle: {
+                                text: "各业务线移动均值占比"
+                            },
+                            tooltip: {
+                                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b>'
+                            },
+                            plotOptions: {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '<b>{point.name}</b>: {point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            },
+                            series: [{
+                                name: 'Brands',
+                                colorByPoint: true,
+                                data: [{
+                                    name: '点对点',
+                                    y: YD_ptop_average_percent
+                                }, {
+                                    name: '极会议',
+                                    y: YD_meeting_average_percent
+                                }, {
+                                    name: 'CDN',
+                                    y: YD_cdn_average_percent
+                                }, {
+                                    name: '测试',
+                                    y: YD_test_average_percent
+                                }]
+                            }]
+                    });
+                    }
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+            });
+        </script>
+    </body>
+</html>
