@@ -396,6 +396,8 @@ def handle_api(request,date,host,operator,compute,area):
     host_list = host.split('+')
     operator_1 = '- '+operator.encode('utf-8')
     area_s = area.encode('utf-8')
+    print start_timestamp
+    print end_timestamp
 
     rrd_file_list = []
     for item in host_list:
@@ -420,10 +422,12 @@ def handle_api(request,date,host,operator,compute,area):
     fetch_result_list_max = []
     fetch_result_list_average = []
     for item in rrd_file_list:
-        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_max.append(fetch_result_max)
-        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_average.append(fetch_result_average)
+        print fetch_result_list_max
+        print fetch_result_list_average
 
     traffic_list_MAX = []
     traffic_list_AVERAGE = []

@@ -26,6 +26,42 @@ def get_operator_data(reuqest):
 
     return HttpResponse(json.dumps(data_dit))
 
+#查询页面请求的区域统计数据
+def get_area_data(reuqest):
+
+    traffic_time = models.Area_compute_result.objects.all().order_by('-id')[0:1]
+    traffic_time_s = serializers.serialize("json", traffic_time)
+    traffic_time_json = json.loads(traffic_time_s)
+    print traffic_time_json[0]["fields"]
+    print type(traffic_time_json[0]["fields"])
+    start_time_data = traffic_time_json[0]["fields"]["start_time"]
+    end_time_data = traffic_time_json[0]["fields"]["end_time"]
+    area_data = traffic_time_json[0]["fields"]["area"]
+    max_value_data = traffic_time_json[0]["fields"]["max_value"]
+    average_value_data = traffic_time_json[0]["fields"]["average_value"]
+    data_dit = {"start_time":start_time_data,"end_time":end_time_data,"area":area_data,"max_value":max_value_data,"average_value":average_value_data}
+
+    return HttpResponse(json.dumps(data_dit))
+    #return HttpResponse('ok')
+
+#查询页面请求的业务线统计数据
+def get_service_line_data(reuqest):
+
+    traffic_time = models.Service_line_compute_result.objects.all().order_by('-id')[0:1]
+    traffic_time_s = serializers.serialize("json", traffic_time)
+    traffic_time_json = json.loads(traffic_time_s)
+    print traffic_time_json[0]["fields"]
+    print type(traffic_time_json[0]["fields"])
+    start_time_data = traffic_time_json[0]["fields"]["start_time"]
+    end_time_data = traffic_time_json[0]["fields"]["end_time"]
+    service_line_data = traffic_time_json[0]["fields"]["service_line"]
+    max_value_data = traffic_time_json[0]["fields"]["max_value"]
+    average_value_data = traffic_time_json[0]["fields"]["average_value"]
+    data_dit = {"start_time":start_time_data,"end_time":end_time_data,"service_line":service_line_data,"max_value":max_value_data,"average_value":average_value_data}
+
+    return HttpResponse(json.dumps(data_dit))
+    #return HttpResponse('ok')
+
 #查询接口请求的运营商统计数据
 def get_operator_api_data(request):
 

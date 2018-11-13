@@ -17,7 +17,8 @@ from django.conf.urls import url,include
 from django.contrib import admin
 from statistics.views import index,handle,show_operator,show_compute,show_area,show_service_line
 from statistics.views import handle_api,handle_area_api,handle_service_line_api
-from get_data_display.views import get_operator_data,get_operator_month_count,get_area_month_count,get_service_line_month_count
+from get_data_display.views import get_operator_data,get_area_data,get_service_line_data
+from get_data_display.views import get_operator_month_count,get_area_month_count,get_service_line_month_count
 from get_data_display.views import get_operator_api_data,get_area_api_data,get_service_line_api_data
 
 urlpatterns = [
@@ -34,8 +35,10 @@ urlpatterns = [
     url(r'^get_operator_data/',get_operator_data),
     url(r'^get_operator_api_data/',get_operator_api_data),
     url(r'^get_operator_month_count/',get_operator_month_count),
+    url(r'^get_area_data/',get_area_data),
     url(r'^get_area_api_data/',get_area_api_data),
     url(r'^get_area_month_count/',get_area_month_count),
+    url(r'^get_service_line_data/',get_service_line_data),
     url(r'^get_service_line_api_data/', get_service_line_api_data),
     url(r'^get_service_line_month_count/', get_service_line_month_count),
 ]

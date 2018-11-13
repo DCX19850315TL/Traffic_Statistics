@@ -1,10 +1,101 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>按区域进行的流量数据统计</title>
-</head>
-<body>
-
-</body>
+    <head>
+        <meta charset="utf-8"><link rel="icon" href="https://static.jianshukeji.com/highcharts/images/favicon.ico">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>按区域进行的流量数据统计</title>
+        <!--<style>
+            /* css 代码  */
+        </style>-->
+        <script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+        <script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+        <script src="https://img.hcharts.cn/highcharts-plugins/highcharts-zh_CN.js"></script>
+        <script src="../../static/js/jquery-1.12.4.min.js"></script>
+    </head>
+    <body>
+        <div id="container" style="min-width:400px;height:400px"></div>
+        <script>
+            $(function () {
+                $.ajax({
+                url:'/get_area_data/',
+                type:'GET',
+                scriptCharset:'utf-8',
+                success:function(data) {
+                    console.log(data);
+                    var start_time_data = JSON.parse(data).start_time;
+                    var end_time_data = JSON.parse(data).end_time;
+                    var max_data = JSON.parse(data).max_value;
+                    var average_data = JSON.parse(data).average_value;
+                    var area_data = JSON.parse(data).area;
+                    var time_data = start_time_data+"  ——  "+end_time_data;
+                    console.log(time_data);
+                    var chart = Highcharts.chart('container', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: 'BGP各区域峰值/均值使用情况'
+                        },
+                        subtitle: {
+                            text: area_data
+                        },
+                        xAxis: {
+                            categories: [time_data]
+                        },
+                        yAxis: {
+                            min: 0,
+                            title: {
+                                text: '带宽使用情况,单位Mbit'
+                            },
+                            stackLabels: {  // 堆叠数据标签
+                                enabled: true,
+                                style: {
+                                    fontWeight: 'bold',
+                                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                                }
+                            }
+                        },
+                        //图例
+                        legend: {
+                            align: 'right',
+                            x: -30,
+                            verticalAlign: 'top',
+                            y: 25,
+                            floating: true,
+                            backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                            borderColor: '#CCC',
+                            borderWidth: 1,
+                            shadow: false
+                        },
+                        //柱状图竖着堆叠
+                        plotOptions: {
+                            column: {
+                                stacking: 'normal',
+                                dataLabels: {
+                                    enabled: true,
+                                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                                    style: {
+                                        // 如果不需要数据标签阴影，可以将 textOutline 设置为 'none'
+                                        textOutline: '1px 1px black'
+                                    }
+                                }
+                            }
+                        },
+                        //数据列
+                        series: [{
+                            name: '峰值',
+                            data: [max_data]
+                        }, {
+                            name: '均值',
+                            data: [average_data]
+                        }]
+                });
+                },
+                error:function () {
+                    console.log('failed');
+                },
+            });
+            });
+        </script>
+    </body>
 </html>
