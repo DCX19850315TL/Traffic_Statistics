@@ -3,164 +3,233 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>index</title>
-    <script type="text/javascript" src="../static/js/jquery-1.12.4.min.js"></script>
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrapValidator.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrap-datetimepicker.min.css">
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../static/js/docs.min.js"></script>
+    <script src="../static/js/bootstrapValidator.min.js"></script>
+    <script src="../static/js/bootstrap-datetimepicker.min.js"></script>
+    <script src="../static/js/bootstrap-datetimepicker.zh-CN.js"></script>
+    <style>
+        .row-space{
+            margin-bottom: 15px;
+        }
+        .dropdown-list-left{
+            float: left;
+        }
+        .dropdown-list-right{
+            float: right;
+        }
+    </style>
 </head>
 <body>
-    <div style="text-align: center">
-        <h1 style="font-size: 20px;font-weight: bold">流量统计页面</h1>
-    </div>
-    <div>
-        <form action="/handle/" method="post">
-            <div style="float: left">
-                <b style="font-weight: bold">起始时间</b>
-                <input type="datetime-local" step="1" name="start_time">
+    <div class="container">
+        <div class="row row-space">
+            <div class="col-md-12">
+                <h1 class="page-header text-center">流量统计页面</h1>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for...">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="button">Go!</button>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-7 text-center">
+                    <a href="http://192.168.137.2:9000/get_operator_month_count/" class="btn btn-primary">运营商月流量统计</a>
+                    <a href="http://192.168.137.2:9000/get_area_month_count/" class="btn btn-primary">区域月流量统计</a>
+                    <a href="http://192.168.137.2:9000/get_service_line_month_count/" class="btn btn-primary">业务线月流量统计</a>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group" style="float:right;">
+                        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                            配置<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a href="http://192.168.137.2:9000/host_group">主机分组</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div style="float: left;margin-left: 15px;">
-                <b style="font-weight: bold">结束时间</b>
-                <input type="datetime-local" step="1" name="end_time">
-                <p></p>
-            </div>
-            <table style="width: 100%" border="0" cellpadding="4" cellspacing="0">
-                <tbody>
-                    <tr>
-                        <td>
-                            <select id="host_data_in_id" multiple name="host_data_in" size="12">
-                                <!--<option value="0">!--- 请选择主机 ---!</option>-->
-                                {% comment %}{% for item in data %}
-                                    <option value="{{ item.description }}">{{ item.description }}</option>
-                                {% endfor %}{% endcomment %}
-                            </select>
-                        </td>
-                        <td>
-                            <input type="button" name="addToGroup" value=" >> " onclick="addToGroup_f()">
+        </div>
+        <div class="row row-space">
+            <form class="form-group">
+                <div class="row row-space">
+                    <div class="col-md-6">
+                        <input type="text" id="start_time" name="start_time" style="float: right;" placeholder="yyyy-mm-dd hh:ii:ss"><strong style="float: right;margin-right: 10px">起始时间</strong>
+                    </div>
+                    <div class="col-md-6">
+                        <input type="text" id="end_time" name="end_time" placeholder="yyyy-mm-dd hh:ii:ss"><strong style="float: left;margin-right: 10px">结束时间</strong>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select id="host_data_in_id" multiple="true" name="host_data_in" size="12">
+                                        {% for item in data %}
+                                            <option value="{{ item.description }}">{{ item.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="button" id="addToGroup" value=" >> ">
 
-                            <input type="button" name="remFromGroup" value=" << " onclick="remFromGroup_f()">
-                        </td>
-                        <td>
-                            <select id="host_data_out_id" style="margin-right: 500px" multiple="true" name="host_data_out" size="12">
-                                {% for item in data %}
-                                    <option value="{{ item.description }}">{{ item.description }}</option>
-                                {% endfor %}
-                            </select>
-                            <!--<select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
-                                <option value="0">!--- 选中的主机 ---!</option>
-                            </select>-->
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <p></p>
-            <b>运营商:</b>
-                <select id="operator_select" name="operator_data">
-                    <option value="0">selected</option>
-                </select>
-            <p></p>
-            <b>计算方法:</b>
-                <select id="compute_select" name="compute_data">
-                    <option value="0">selected</option>
-                </select>
-            <p></p>
-            <b>区域:</b>
-                <select id="area_select" name="area_data">
-                    <option value="0">selected</option>
-                </select>
-            <p></p>
-            <b>业务线:</b>
-                <select id="service_line_select" name="service_line_data">
-                    <option value="0">selected</option>
-                </select>
-            <p></p>
-            <input type="submit" value="提交">
-        </form>
-    <div><a href="http://192.168.137.2:9000/get_operator_month_count/">查看运营商月流量统计</a></div>
-    <div><a href="http://192.168.137.2:9000/get_area_month_count/">查看区域月流量统计</a></div>
-    <div><a href="http://192.168.137.2:9000/get_service_line_month_count/">查看业务线月流量统计</a></div>
+                                    <input type="button" id="remFromGroup" value=" << ">
+                                </td>
+                                <td>
+                                    <select id="host_data_out_id" multiple name="host_data_out" size="12" style="margin-right: 500px">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-5">
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select id="host_data_in_id" multiple name="host_data_in" size="12">
+                                        {% for item in data %}
+                                            <option value="{{ item.description }}">{{ item.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="button" name="addToGroup" class="menuA" value=" >> " onclick="addToGroup_f()">
+
+                                    <input type="button" name="remFromGroup" value=" << " onclick="remFromGroup_f()">
+                                </td>
+                                <td>
+                                    <select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-2">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-default dropdown-toggle pull-left" data-toggle="dropdown" id="operator-toggle">
+                            运营商<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="operator-menu">
+                        </ul>
+                        <button type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown" id="compute-toggle" style="bottom: 34px;left: 10px">
+                            计算方法<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="compute-menu">
+                        </ul>
+                        <button type="button" class="btn btn-default dropdown-toggle pull-left" data-toggle="dropdown" id="area-toggle" style="top: 100px">
+                            区域<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="area-menu">
+                        </ul>
+                        <button type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown" id="service_line-toggle">
+                            业务线<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" id="servcie_line-menu">
+                        </ul>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row row-space">
+            <div class="col-md-12 text-center">
+                <strong>Butel运维网管支撑部</strong>
+            </div>
+        </div>
     </div>
 </body>
-<script>
-    //点击按钮后将选中的主机放到提交表格中
-    function addToGroup_f(data){
-        //var option = $("<option>").text(data);
-        //console.log(option);
-        //var option = $("<option>").text(data).attr({value:data});
-        var option = $('option').text(data).attr({value:data});
-        console.log(option);
-        $('#host_data_out_id').append(option);
-    };
-    $('#host_data_in_id option').select(function () {
-        var old_data = $(this).text();
-        console.log(old_data);
-        $("input[name='addToGroup']").click(function () {
-            addToGroup_f(old_data);
-            console.log(addToGroup_f(old_data));
+<script type="text/javascript">
+    $("#operator-toggle").bind("click",function () {
+        $.ajax({
+            url:'/show_operator/',
+            type:'GET',
+            success:function (data) {
+                $("#operator-menu").empty();
+                $.each($.parseJSON(data),function (k,v) {
+                    $("#operator-menu").append("<li><a href='#'>"+v.operator+"</a></li>");
+                });
+            },
+            error:function () {
+                console.log('failed');
+            },
         });
-        //$('#host_data_out_id').addToGroup(old_data,old_data);
-        //console.log(addToGroup_f(old_data,old_data));
-        //console.log(data_in);
-
-        //console.log(data_in);
-        /*var data_in = $(this);
-        var data_out = $('#host_data_out_id');
-        console.log();
-        addToGroup_f(data_in,data_out);
-        console.log;*/
     });
-    $.ajax({
-        url:'/show_operator/',
-        type:'GET',
-        success:function (data) {
-            $('#operator_select').empty();
-            $('#operator_select').append("<option>selected</option>");
-            $.each($.parseJSON(data),function (k,v) {
-                $("#operator_select").append("<option value='"+v.id+"'>"+v.operator+"</option>");
-            });
-        },
-        error:function () {
-            console.log('failed');
-        },
+    $("#compute-toggle").bind("click",function () {
+        $.ajax({
+            url:'/show_compute/',
+            type:'GET',
+            success:function (data) {
+                $("#compute-menu").empty();
+                $.each($.parseJSON(data),function (k,v) {
+                    $("#compute-menu").append("<li><a href='#'>"+v.compute+"</a></li>");
+                });
+            },
+            error:function () {
+                console.log('failed');
+            },
+        });
     });
-    $.ajax({
-        url:'/show_compute/',
-        type:'GET',
-        success:function (data) {
-            $('#compute_select').empty();
-            $('#compute_select').append("<option>selected</option>");
-            $.each($.parseJSON(data),function (k,v) {
-                $("#compute_select").append("<option value='"+v.id+"'>"+v.compute+"</option>");
-            });
-        },
-        error:function () {
-            console.log('failed');
-        },
+    $("#area-toggle").bind("click",function () {
+        $.ajax({
+            url:'/show_area/',
+            type:'GET',
+            success:function (data) {
+                $("#area-menu").empty();
+                $.each($.parseJSON(data),function (k,v) {
+                    $("#area-menu").append("<li><a href='#'>"+v.area+"</a></li>");
+                });
+            },
+            error:function () {
+                console.log('failed');
+            },
+        });
     });
-    $.ajax({
-        url:'/show_area/',
-        type:'GET',
-        success:function (data) {
-            $('#area_select').empty();
-            $('#area_select').append("<option>selected</option>");
-            $.each($.parseJSON(data),function (k,v) {
-                $("#area_select").append("<option value='"+v.id+"'>"+v.area+"</option>");
-            });
-        },
-        error:function () {
-            console.log('failed');
-        },
+    $("#service_line-toggle").bind("click",function () {
+        $.ajax({
+            url:'/show_service_line/',
+            type:'GET',
+            success:function (data) {
+                $("#service_line-menu").empty();
+                $.each($.parseJSON(data),function (k,v) {
+                    $("#service_line-menu").append("<li><a href='#'>"+v.service_line+"</a></li>");
+                });
+            },
+            error:function () {
+                console.log('failed');
+            },
+        });
     });
-    $.ajax({
-        url:'/show_service_line/',
-        type:'GET',
-        scriptCharset:'utf-8',
-        success:function (data) {
-            $('#service_line_select').empty();
-            $('#service_line_select').append("<option>selected</option>");
-            $.each($.parseJSON(data),function (k,v) {
-                $("#service_line_select").append("<option value='"+v.id+"'>"+v.service_line+"</option>");
-            });
-        },
-        error:function () {
-            console.log('failed');
-        },
+    $("#start_time").datetimepicker({
+        format: 'yyyy-mm-ddThh:ii:ss'
+    });
+    $("#end_time").datetimepicker({
+        format: 'yyyy-mm-ddThh:ii:ss'
+    });
+    var selected_host_out_id = $('#host_data_out_id');
+    $("#addToGroup").on('click',function () {
+        var html = "";
+        $('#host_data_in_id option:selected').each(function () {
+           var option = $(this);
+           if(selected_host_out_id.find("option[value="+ option.val() +"]").length == 0) {
+               if (option.hasClass('menuA')) {
+                   selected_host_out_id.append("<option value='"+ option.val() +"' class='menuA'>"+ option.text() +"</option>");
+               }else{
+                   selected_host_out_id.append("<option value='"+ option.val() +"'>"+ option.text() +"</option>");
+               }
+           }else {
+               alert('主机已经添加过');
+           }
+        });
+    });
+    $('#remFromGroup').on('click',function () {
+       $('#host_data_out_id option:selected').remove();
     });
 </script>
 </html>

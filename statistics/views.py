@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.shortcuts import render,render_to_response
+from django.shortcuts import render,render_to_response,redirect
 # Create your views here.
 from django.http.response import HttpResponse
 from statistics import models
@@ -9,6 +9,7 @@ import json
 import time
 import rrdtool
 import os,sys
+from django.core import serializers
 
 rrdpath = '/usr/local/apache2/htdocs/cacti/rra'
 
@@ -21,6 +22,7 @@ def index(request):
         data = cur.execute('select description from host')
         all_data = cur.fetchall()
         print all_data
+        print type(all_data)
 
         cur.close()
         conn.close()
@@ -28,6 +30,92 @@ def index(request):
         print e
 
     return render_to_response('index.html',{'data':all_data})
+
+#设置分组的页面
+def host_group(request):
+
+    conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+    cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+    data = cur.execute('select description from host where group_id is NULL')
+    not_group_host_list = cur.fetchall()
+
+    cur.close()
+    conn.close()
+
+    print not_group_host_list
+    print type(not_group_host_list)
+
+    group_name_list = models.Host_group.objects.all().values('group_name')
+
+    #return render_to_response('host_group.html',{'group_name_list':group_name_list},{'not_group_host_list':not_group_host_list})
+    return render_to_response('host_group.html',{'not_group_host_list': not_group_host_list,'group_name_list':group_name_list})
+
+#创建分组的页面
+def create_group(request):
+
+    if request.method == 'GET':
+
+        return render_to_response('create_group.html')
+
+    if request.method == 'POST':
+
+        group_name = request.POST.get('group_name')
+        group_comment = request.POST.get('group_comment')
+
+        group_name_is = models.Host_group.objects.filter(group_name=group_name)
+        if group_name_is:
+            return render_to_response('host_group.html')
+        else:
+            models.Host_group.objects.create(group_name=group_name,comment=group_comment)
+
+        return render_to_response('host_group.html')
+
+#删除分组的页面
+def delete_group(request):
+
+    return render_to_response('delete_group.html')
+
+#添加主机到主机组
+def add_host_to_group(request):
+
+    if request.method == 'GET':
+
+        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+        data = cur.execute('select description from host where group_id is NULL')
+        not_group_host_list = cur.fetchall()
+
+        cur.close()
+        conn.close()
+
+        return render_to_response('add_host_to_group.html',{'not_group_host_list': not_group_host_list})
+
+    if request.method == 'POST':
+
+        group_name = request.POST.get('group_name')
+        group_name_id = models.Host_group.objects.filter(group_name=group_name)
+        group_name_id_s = serializers.serialize('json', group_name_id)
+        group_name_id_json = json.loads(group_name_id_s)
+        group_name_id_only = group_name_id_json[0]['pk']
+        host_list = request.POST.getlist('group_to_host_list')
+
+        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        cur = conn.cursor()
+
+        sql = "update host set group_id = '{0}' where description = %s".format(group_name_id_only)
+        data = cur.executemany(sql,host_list)
+
+        cur.close()
+        conn.close()
+
+        return render_to_response('host_group.html')
+
+#从主机组中删除主机
+def del_host_from_group(request):
+
+    return render_to_response('del_host_from_group.html')
 
 #将页面传过来的数据进行计算，并将数据返给页面
 def handle(request):
@@ -530,9 +618,9 @@ def handle_area_api(request,date,host,operator,compute,area):
     fetch_result_list_max = []
     fetch_result_list_average = []
     for item in rrd_file_list:
-        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_max.append(fetch_result_max)
-        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_average.append(fetch_result_average)
 
     traffic_list_MAX = []
@@ -637,9 +725,9 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
     fetch_result_list_max = []
     fetch_result_list_average = []
     for item in rrd_file_list:
-        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_max = rrdtool.fetch(item, str('MAX'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_max.append(fetch_result_max)
-        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-s' + ' ' + end_timestamp))
+        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_average.append(fetch_result_average)
 
     traffic_list_MAX = []

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>主机组配置</title>
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrapValidator.min.css">
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../static/js/docs.min.js"></script>
+    <script src="../static/js/bootstrapValidator.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <a href="http://192.168.137.2:9000/create_group" class="btn btn-primary">创建分组</a>
+                <a href="http://192.168.137.2:9000/delete_group" class="btn btn-danger">删除分组</a>
+                <a href="http://192.168.137.2:9000/add_host_to_group" class="btn btn-primary">添加主机到分组</a>
+                <a href="http://192.168.137.2:9000/del_host_from_group" class="btn btn-danger">删除分组中主机</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <table class="table-bordered table-striped">
+                    <caption class="text-center"><strong>分组与主机对应关系</strong></caption>
+                    <th>
+                        <p class="text-center">分组列表</p>
+                    </th>
+                    <th>
+                        <p class="text-center">主机列表</p>
+                    </th>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="group_list_id" multiple="false" name="group_list" size="12">
+                                    {% for item in group_name_list %}
+                                        <option value="{{ item.group_name }}">{{ item.group_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            <td>
+                                <select id="group_to_host_list_id" name="group_to_host_list" size="12">
+
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-3 col-md-offset-1">
+                <table class="table-bordered table-striped">
+                    <caption class="text-center"><strong>未分配主机的列表</strong></caption>
+                    <th>
+                        <p class="text-center">主机列表</p>
+                    </th>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <select id="not_group_host_list_id" name="not_group_host_list" size="12">
+                                    {% for item in not_group_host_list %}
+                                        <option value="{{ item.description }}">{{ item.description }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    $('#group_list_id option').click(function () {
+        var group_name = $(this).val();
+        $.ajax({
+            url:'/get_group_to_host_list/',
+            type:'POST',
+            data:{"group_name":group_name},
+            success:function (data) {
+                $("#group_to_host_list_id").empty();
+                $.each($.parseJSON(data),function (k,v) {
+                    $("#group_to_host_list_id").append("<option value='"+v.description+"'>"+v.description+"</option>");
+                });
+            },
+            error:function () {
+                console.log('failed');
+            },
+        });
+    });
+</script>
+</html>

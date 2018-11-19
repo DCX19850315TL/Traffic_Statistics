@@ -9,6 +9,7 @@ from django.core import serializers
 from statistics import models
 import json
 import os
+import MySQLdb
 
 #查询页面请求的运营商统计数据
 def get_operator_data(reuqest):
@@ -487,3 +488,42 @@ def get_area_month_count(request):
 def get_service_line_month_count(request):
 
     return render_to_response('service_line_traffic_month_count.html')
+
+#ajax获取分组信息
+def get_group_name(request):
+
+    group_name_list = []
+    group_name = models.Host_group.objects.all()
+    group_name_s = serializers.serialize('json',group_name)
+    group_name_json = json.loads(group_name_s)
+    for item in group_name_json:
+        group_name_item = item['fields']['group_name']
+        group_name_list.append(group_name_item)
+
+    return HttpResponse(json.dumps(group_name_list))
+
+#获取主机组对应的主机列表
+def get_group_to_host_list(request):
+
+    if request.method == 'POST':
+
+        group_name = request.POST.get('group_name')
+        group_name_id = models.Host_group.objects.filter(group_name=group_name)
+        group_name_id_s = serializers.serialize('json',group_name_id)
+        group_name_id_json = json.loads(group_name_id_s)
+        group_name_id_only = group_name_id_json[0]['pk']
+
+        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
+
+        sql = 'select description from host where group_id = %s'
+        data = cur.execute(sql,group_name_id_only)
+        not_group_host_list = cur.fetchall()
+        print not_group_host_list
+
+        cur.close()
+        conn.close()
+
+    return HttpResponse(json.dumps(not_group_host_list))
+
+    #return HttpResponse(json.dumps())

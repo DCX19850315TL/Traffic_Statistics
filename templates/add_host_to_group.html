@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>添加主机到分组</title>
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrapValidator.min.css">
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../static/js/docs.min.js"></script>
+    <script src="../static/js/bootstrapValidator.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <form class="form-group" action="/add_host_to_group/" method="post">
+                    <select class="form-control" id="group_name_id" name="group_name">
+                        <option value="0">选择主机组</option>
+                    </select>
+                    <table>
+                        <th class="text-center">
+                            <p>未分配的主机列表</p>
+                        </th>
+                        <th></th>
+                        <th class="text-center">
+                            <p>选中的主机</p>
+                        </th>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <select id="not_group_host_list_id" multiple="false" name="not_group_host_list" size="12">
+                                        {% for item in not_group_host_list %}
+                                            <option value="{{ item.description }}">{{ item.description }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </td>
+                                <td>
+                                    <input type="button" id="addToGroup" class="menuA" value=" >> ">
+
+                                    <input type="button" id="remFromGroup" value=" << ">
+                                </td>
+                                <td>
+                                    <select id="group_to_host_list_id" multiple="true" name="group_to_host_list" size="12">
+                                    </select>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn btn-primary" type="submit">OK</button>
+                    <button class="btn btn-danger" type="reset">CANCEL</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    $.ajax({
+        url:'/get_group_name/',
+        type:'GET',
+        success:function (data) {
+            $("#group_name_id").empty();
+            $("#group_name_id").append("<option value=\"0\">选择主机组</option>")
+            var group_name_list = JSON.parse(data);
+            $.each(group_name_list,function (k,v) {
+                $("#group_name_id").append("<option value='"+ v +"'>"+ v +"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
+    });
+    var group_to_host_list_id = $('#group_to_host_list_id');
+    $("#addToGroup").on('click',function () {
+        var html = "";
+        $('#not_group_host_list_id option:selected').each(function () {
+           var option = $(this);
+           if(group_to_host_list_id.find("option[value="+ option.val() +"]").length == 0) {
+               if (option.hasClass('menuA')) {
+                   group_to_host_list_id.append("<option selected value='"+ option.val() +"' class='menuA'>"+ option.text() +"</option>");
+               }else{
+                   group_to_host_list_id.append("<option selected value='"+ option.val() +"'>"+ option.text() +"</option>");
+               }
+           }else {
+               alert('主机已经添加过');
+           }
+        });
+    });
+    $('#remFromGroup').on('click',function () {
+       $('#group_to_host_list_id option:selected').remove();
+    });
+</script>
+</html>

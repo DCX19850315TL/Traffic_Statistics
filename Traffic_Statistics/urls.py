@@ -15,16 +15,22 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
-from statistics.views import index,handle,show_operator,show_compute,show_area,show_service_line
+from statistics.views import index,handle,host_group,create_group,delete_group,add_host_to_group,del_host_from_group,show_operator,show_compute,show_area,show_service_line
 from statistics.views import handle_api,handle_area_api,handle_service_line_api
 from get_data_display.views import get_operator_data,get_area_data,get_service_line_data
 from get_data_display.views import get_operator_month_count,get_area_month_count,get_service_line_month_count
 from get_data_display.views import get_operator_api_data,get_area_api_data,get_service_line_api_data
+from get_data_display.views import get_group_name,get_group_to_host_list
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^index/',index),
     url(r'^handle/',handle),
+    url(r'^host_group/',host_group),
+    url(r'^create_group/',create_group),
+    url(r'^delete_group/',delete_group),
+    url(r'^add_host_to_group/',add_host_to_group),
+    url(r'^del_host_from_group/',del_host_from_group),
     url(r'^show_operator/',show_operator),
     url(r'^show_compute/',show_compute),
     url(r'^show_area/',show_area),
@@ -41,4 +47,6 @@ urlpatterns = [
     url(r'^get_service_line_data/',get_service_line_data),
     url(r'^get_service_line_api_data/', get_service_line_api_data),
     url(r'^get_service_line_month_count/', get_service_line_month_count),
+    url(r'^get_group_name/',get_group_name),
+    url(r'^get_group_to_host_list/',get_group_to_host_list),
 ]

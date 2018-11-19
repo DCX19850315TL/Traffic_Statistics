@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>创建分组</title>
+    <script src="../static/js/jquery-1.12.4.min.js"></script>
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/bootstrapValidator.min.css">
+    <script src="../static/bootstrap/js/bootstrap.min.js"></script>
+    <script src="../static/js/docs.min.js"></script>
+    <script src="../static/js/bootstrapValidator.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <form class="form-group" action="/create_group/" method="post">
+                    <label>分组名称</label>
+                    <input type="text" class="form-control" name="group_name" placeholder="分组名称">
+                    <label>备注</label>
+                    <input type="text" class="form-control" name="group_comment" placeholder="备注">
+                    <button type="submit" class="btn btn-primary">OK</button>
+                    <button type="reset" class="btn btn-danger">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
