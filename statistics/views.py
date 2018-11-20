@@ -76,7 +76,7 @@ def delete_group(request):
 
     return render_to_response('delete_group.html')
 
-#添加主机到主机组
+#添加主机到主机组a
 def add_host_to_group(request):
 
     if request.method == 'GET':
