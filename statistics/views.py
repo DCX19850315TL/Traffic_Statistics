@@ -21,15 +21,17 @@ def index(request):
 
         data = cur.execute('select description from host')
         all_data = cur.fetchall()
-        print all_data
-        print type(all_data)
 
         cur.close()
         conn.close()
+
+        group_name_list = models.Host_group.objects.all().values('group_name')
+
     except Exception,e:
         print e
 
-    return render_to_response('index.html',{'data':all_data})
+    return render_to_response('index.html', {'data':all_data, 'group_name_list':group_name_list})
+    #return render_to_response('index.bak.html', {'data': all_data})
 
 #设置分组的页面
 def host_group(request):
@@ -48,7 +50,6 @@ def host_group(request):
 
     group_name_list = models.Host_group.objects.all().values('group_name')
 
-    #return render_to_response('host_group.html',{'group_name_list':group_name_list},{'not_group_host_list':not_group_host_list})
     return render_to_response('host_group.html',{'not_group_host_list': not_group_host_list,'group_name_list':group_name_list})
 
 #创建分组的页面
@@ -123,9 +124,11 @@ def handle(request):
     if request.method == 'POST':
 
         print request.POST
-
-        host = request.POST.getlist('host_data_out')
-        #host_str = host.encode('utf-8')
+        host_data_out = request.POST.getlist('host_data_out')
+        if host_data_out:
+            host = request.POST.getlist('host_data_out')
+        else:
+            host = request.POST.getlist('group_to_host_list')
         operator = request.POST.get('operator_data')
         operator_str = operator.encode('utf-8')
         start_time = request.POST.get('start_time')
@@ -179,7 +182,7 @@ def handle(request):
             compute_type_str = str(compute_type[0]).strip(')').strip('(').strip(',').strip("'").encode('utf-8')
 
 
-        if area_str == "selected":
+        if area_str == "0":
             pass
         else:
             # 查询传过来的区域ID对应的区域名字
@@ -196,7 +199,7 @@ def handle(request):
 
             area_type_str = str(area_type[0]).strip(')').strip('(').strip(',').strip("'").encode('utf-8')
 
-        if service_line_str == "selected":
+        if service_line_str == "0":
             pass
         else:
             # 查询传过来的业务线ID对应的业务线名字
@@ -245,16 +248,12 @@ def handle(request):
                 fetch_result_average = rrdtool.fetch(item,str('AVERAGE'),start_time_stamp_rrd,end_time_stamp_rrd)
                 fetch_result_list_average.append(fetch_result_average)
 
-            print fetch_result_list_max
-            #print fetch_result_list_average
         else:
             for item in rrd_file_list:
                 start_time_stamp_rrd = str('-s'+' '+start_time_stamp)
                 end_time_stamp_rrd = str('-e'+' '+end_time_stamp)
                 fetch_result = rrdtool.fetch(item,compute_type_str,start_time_stamp_rrd,end_time_stamp_rrd)
                 fetch_result_list.append(fetch_result)
-
-            print fetch_result_list
 
         traffic_list = []
         traffic_list_count = []
@@ -279,7 +278,6 @@ def handle(request):
                 traffic_list_count_MAX.append(traffic_max)
                 traffic_list_MAX = []
 
-            print sum(traffic_list_count_MAX)
             traffic_list_count_MAX_sum = sum(traffic_list_count_MAX)
 
             for item in fetch_result_list_average:
@@ -299,7 +297,6 @@ def handle(request):
                 traffic_list_count_AVERAGE.append(traffic_average)
                 traffic_list_AVERAGE = []
 
-            print sum(traffic_list_count_AVERAGE)
             traffic_list_count_AVERAGE_sum = sum(traffic_list_count_AVERAGE)
         else:
 
@@ -324,11 +321,10 @@ def handle(request):
                     traffic_average = round(traffic_sum / traffic_list_len / float(1024) / float(1024), 2)
                     traffic_list_count.append(traffic_average)
                     traffic_list = []
-                
-            print sum(traffic_list_count)
+
             traffic_list_count_sum = sum(traffic_list_count)
 
-        if area_str == "selected" and service_line_str == "selected":
+        if area_str == "0" and service_line_str == "0":
             #按运营商进行的流量数据统计
             print 'operator'
             if compute_type_str == "ALL":
@@ -342,7 +338,7 @@ def handle(request):
                 return render_to_response('operator_traffic.html')
             else:
                 print "no data"
-        elif service_line_str == "selected":
+        elif service_line_str == "0":
             #按区域进行的流量数据统计
             print 'area'
             if compute_type_str == "ALL":
@@ -356,7 +352,7 @@ def handle(request):
                 return render_to_response('area_traffic.html')
             else:
                 print "no data"
-        elif area_str == "selected":
+        elif area_str == "0":
             #按业务线进行的流量数据统计
             print 'service_line'
             if compute_type_str == "ALL":

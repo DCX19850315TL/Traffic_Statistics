@@ -55,7 +55,7 @@
             </div>
         </div>
         <div class="row row-space">
-            <form class="form-group">
+            <form id="form_handle" class="form-group" action="/handle/" method="post">
                 <div class="row row-space">
                     <div class="col-md-6">
                         <input type="text" id="start_time" name="start_time" style="float: right;" placeholder="yyyy-mm-dd hh:ii:ss"><strong style="float: right;margin-right: 10px">起始时间</strong>
@@ -64,7 +64,7 @@
                         <input type="text" id="end_time" name="end_time" placeholder="yyyy-mm-dd hh:ii:ss"><strong style="float: left;margin-right: 10px">结束时间</strong>
                     </div>
                 </div>
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <table>
                         <tbody>
                             <tr>
@@ -81,60 +81,48 @@
                                     <input type="button" id="remFromGroup" value=" << ">
                                 </td>
                                 <td>
-                                    <select id="host_data_out_id" multiple name="host_data_out" size="12" style="margin-right: 500px">
+                                    <select id="host_data_out_id" multiple="true" name="host_data_out" size="12" style="margin-right: 500px">
                                     </select>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="col-md-5">
-                    <table>
+                <div class="col-md-4">
+                    <table class="table-bordered table-striped">
                         <tbody>
                             <tr>
                                 <td>
-                                    <select id="host_data_in_id" multiple name="host_data_in" size="12">
-                                        {% for item in data %}
-                                            <option value="{{ item.description }}">{{ item.description }}</option>
+                                    <select id="group_list_id" multiple="false" name="group_list" size="12">
+                                        {% for item in group_name_list %}
+                                            <option value="{{ item.group_name }}">{{ item.group_name }}</option>
                                         {% endfor %}
                                     </select>
                                 </td>
                                 <td>
-                                    <input type="button" name="addToGroup" class="menuA" value=" >> " onclick="addToGroup_f()">
-
-                                    <input type="button" name="remFromGroup" value=" << " onclick="remFromGroup_f()">
-                                </td>
-                                <td>
-                                    <select id="host_data_out_id" style="margin-right: 500px" multiple name="host_data_out" size="12">
+                                    <select id="group_to_host_list_id" multiple="true" name="group_to_host_list" size="12">
                                     </select>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                    <button id="cancel_group" class="btn btn-danger" type="button">清空主机</button>
                 </div>
-                <div class="col-md-2">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-default dropdown-toggle pull-left" data-toggle="dropdown" id="operator-toggle">
-                            运营商<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="operator-menu">
-                        </ul>
-                        <button type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown" id="compute-toggle" style="bottom: 34px;left: 10px">
-                            计算方法<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="compute-menu">
-                        </ul>
-                        <button type="button" class="btn btn-default dropdown-toggle pull-left" data-toggle="dropdown" id="area-toggle" style="top: 100px">
-                            区域<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="area-menu">
-                        </ul>
-                        <button type="button" class="btn btn-default dropdown-toggle pull-right" data-toggle="dropdown" id="service_line-toggle">
-                            业务线<span class="caret"></span>
-                        </button>
-                        <ul class="dropdown-menu" id="servcie_line-menu">
-                        </ul>
-                    </div>
+                <div class="col-md-4">
+                    <select id="operator_select" name="operator_data">
+                        <option value="0">运营商</option>
+                    </select>
+                    <select id="compute_select" name="compute_data">
+                        <option value="0">计算方法</option>
+                    </select>
+                    <select id="area_select" name="area_data">
+                        <option value="0">区域</option>
+                    </select>
+                    <select id="service_line_select" name="service_line_data">
+                        <option value="0">业务线</option>
+                    </select>
+                    <button id="commint_button" class="btn btn-primary" type="submit" style="margin-top: 150px;margin-left: 230px">OK</button>
+                    <button class="btn btn-danger" type="reset" style="margin-top: 150px;float: right">CANCEL</button>
                 </div>
             </form>
         </div>
@@ -146,65 +134,61 @@
     </div>
 </body>
 <script type="text/javascript">
-    $("#operator-toggle").bind("click",function () {
-        $.ajax({
-            url:'/show_operator/',
-            type:'GET',
-            success:function (data) {
-                $("#operator-menu").empty();
-                $.each($.parseJSON(data),function (k,v) {
-                    $("#operator-menu").append("<li><a href='#'>"+v.operator+"</a></li>");
-                });
-            },
-            error:function () {
-                console.log('failed');
-            },
-        });
+    $.ajax({
+        url:'/show_operator/',
+        type:'GET',
+        success:function (data) {
+            $("#operator_select").empty();
+            $("#operator_select").append("<option value=\"0\">运营商</option>")
+            $.each($.parseJSON(data),function (k,v) {
+                $("#operator_select").append("<option value='"+ v.id +"'>"+ v.operator +"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
     });
-    $("#compute-toggle").bind("click",function () {
-        $.ajax({
-            url:'/show_compute/',
-            type:'GET',
-            success:function (data) {
-                $("#compute-menu").empty();
-                $.each($.parseJSON(data),function (k,v) {
-                    $("#compute-menu").append("<li><a href='#'>"+v.compute+"</a></li>");
-                });
-            },
-            error:function () {
-                console.log('failed');
-            },
-        });
+    $.ajax({
+        url:'/show_compute/',
+        type:'GET',
+        success:function (data) {
+            $("#compute_select").empty();
+            $("#compute_select").append("<option value=\"0\">计算方法</option>")
+            $.each($.parseJSON(data),function (k,v) {
+                $("#compute_select").append("<option value='"+ v.id +"'>"+ v.compute +"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
     });
-    $("#area-toggle").bind("click",function () {
-        $.ajax({
-            url:'/show_area/',
-            type:'GET',
-            success:function (data) {
-                $("#area-menu").empty();
-                $.each($.parseJSON(data),function (k,v) {
-                    $("#area-menu").append("<li><a href='#'>"+v.area+"</a></li>");
-                });
-            },
-            error:function () {
-                console.log('failed');
-            },
-        });
+    $.ajax({
+        url:'/show_area/',
+        type:'GET',
+        success:function (data) {
+            $("#area_select").empty();
+            $("#area_select").append("<option value=\"0\">区域</option>")
+            $.each($.parseJSON(data),function (k,v) {
+                $("#area_select").append("<option value='"+ v.id +"'>"+ v.area +"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
     });
-    $("#service_line-toggle").bind("click",function () {
-        $.ajax({
-            url:'/show_service_line/',
-            type:'GET',
-            success:function (data) {
-                $("#service_line-menu").empty();
-                $.each($.parseJSON(data),function (k,v) {
-                    $("#service_line-menu").append("<li><a href='#'>"+v.service_line+"</a></li>");
-                });
-            },
-            error:function () {
-                console.log('failed');
-            },
-        });
+    $.ajax({
+        url:'/show_service_line/',
+        type:'GET',
+        success:function (data) {
+            $("#service_line_select").empty();
+            $("#service_line_select").append("<option value=\"0\">业务线</option>")
+            $.each($.parseJSON(data),function (k,v) {
+                $("#service_line_select").append("<option value='"+ v.id +"'>"+ v.service_line +"</option>");
+            });
+        },
+        error:function () {
+            console.log('failed');
+        },
     });
     $("#start_time").datetimepicker({
         format: 'yyyy-mm-ddThh:ii:ss'
@@ -219,9 +203,9 @@
            var option = $(this);
            if(selected_host_out_id.find("option[value="+ option.val() +"]").length == 0) {
                if (option.hasClass('menuA')) {
-                   selected_host_out_id.append("<option value='"+ option.val() +"' class='menuA'>"+ option.text() +"</option>");
+                   selected_host_out_id.append("<option selected value='"+ option.val() +"' class='menuA'>"+ option.text() +"</option>");
                }else{
-                   selected_host_out_id.append("<option value='"+ option.val() +"'>"+ option.text() +"</option>");
+                   selected_host_out_id.append("<option selected value='"+ option.val() +"'>"+ option.text() +"</option>");
                }
            }else {
                alert('主机已经添加过');
@@ -230,6 +214,55 @@
     });
     $('#remFromGroup').on('click',function () {
        $('#host_data_out_id option:selected').remove();
+    });
+    $('#group_list_id option').click(function () {
+        var group_name = $(this).val();
+        $.ajax({
+            url:'/get_group_to_host_list/',
+            type:'POST',
+            data:{"group_name":group_name},
+            success:function (data) {
+                $("#group_to_host_list_id").empty();
+                $.each($.parseJSON(data),function (k,v) {
+                    $("#group_to_host_list_id").append("<option selected value='"+v.description+"'>"+v.description+"</option>");
+                });
+            },
+            error:function () {
+                console.log('failed');
+            },
+        });
+    });
+    var choice_host = $("#host_data_out_id");
+    var choice_group = $("#group_to_host_list_id");
+    $("#commint_button").click(function () {
+        var choice_host_length = choice_host.find("option").length;
+        var choice_group_length = choice_group.find("option").length;
+        var start_time = $("#start_time").val();
+        var end_time = $("#end_time").val();
+        var choice_operator = $("#operator_select").val();
+        var choice_compute = $("#compute_select").val();
+        console.log(choice_operator);
+        console.log(choice_compute);
+
+        if (choice_host_length == 0 && choice_group_length == 0){
+            alert('没有选择主机');
+            return false;
+        }else if (choice_host_length > 0 && choice_group_length > 0){
+            alert('只能通过一种方式选择主机');
+            return false;
+        }else if (start_time == "" || start_time == null){
+            alert('请选择开始时间');
+            return false;
+        }else if (end_time == "" || end_time == null){
+            alert('请选择结束时间');
+            return false;
+        }else if (choice_operator == 0 || choice_compute == 0){
+            alert('运营商和计算方法两个必须全部选中');
+            return false;
+        }
+    });
+    $("#cancel_group").click(function () {
+       $("#group_to_host_list_id").empty();
     });
 </script>
 </html>
