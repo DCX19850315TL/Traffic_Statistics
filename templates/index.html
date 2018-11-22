@@ -38,9 +38,9 @@
                     </div>
                 </div>
                 <div class="col-md-7 text-center">
-                    <a href="http://192.168.137.2:9000/get_operator_month_count/" class="btn btn-primary">运营商月流量统计</a>
-                    <a href="http://192.168.137.2:9000/get_area_month_count/" class="btn btn-primary">区域月流量统计</a>
-                    <a href="http://192.168.137.2:9000/get_service_line_month_count/" class="btn btn-primary">业务线月流量统计</a>
+                    <a href="{% url 'get_operator_month_count' %}" class="btn btn-primary">运营商月流量统计</a>
+                    <a href="{% url 'get_area_month_count' %}" class="btn btn-primary">区域月流量统计</a>
+                    <a href="{% url 'get_service_line_month_count' %}" class="btn btn-primary">业务线月流量统计</a>
                 </div>
                 <div class="col-md-2">
                     <div class="btn-group" style="float:right;">
@@ -48,7 +48,7 @@
                             配置<span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="http://192.168.137.2:9000/host_group">主机分组</a></li>
+                            <li><a href="{% url 'host_group' %}">主机分组</a></li>
                         </ul>
                     </div>
                 </div>
