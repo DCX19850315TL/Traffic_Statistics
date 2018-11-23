@@ -241,6 +241,8 @@
         var end_time = $("#end_time").val();
         var choice_operator = $("#operator_select").val();
         var choice_compute = $("#compute_select").val();
+        var choice_area = $("#area_select").val();
+        var choice_service_line = $("#service_line_select").val();
         console.log(choice_operator);
         console.log(choice_compute);
 
@@ -258,6 +260,9 @@
             return false;
         }else if (choice_operator == 0 || choice_compute == 0){
             alert('运营商和计算方法两个必须全部选中');
+            return false;
+        }else if (choice_area > 0 && choice_service_line > 0){
+            alert('区域和业务线选项只能选中一个');
             return false;
         }
     });
