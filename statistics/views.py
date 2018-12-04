@@ -452,14 +452,14 @@ def handle_api(request,date,host,operator,compute,area):
 
     print date,host,operator,compute,area
 
+    print request.method
+
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
     da = [1,3,5,7,8,10,12]
     xiao = [4,6,9,11]
     month_s = str(date.split('-')[1:]).strip('[]').strip("u").strip("'").encode('utf-8')
     year_s = str(date.split('-')[:1]).strip('[]').strip("u").strip("'").encode('utf-8')
-    print year_s
-    print month_s
     if month_s.startswith('0'):
         month_s = month_s[1:]
     if int(month_s) in da:
@@ -480,8 +480,6 @@ def handle_api(request,date,host,operator,compute,area):
     host_list = host.split('+')
     operator_1 = '- '+operator.encode('utf-8')
     area_s = area.encode('utf-8')
-    print start_timestamp
-    print end_timestamp
 
     rrd_file_list = []
     for item in host_list:
@@ -493,15 +491,28 @@ def handle_api(request,date,host,operator,compute,area):
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
             item_str, operator_1)
         data = cur.execute(sql)
-        rrd = cur.fetchall()
+        if data == 0:
+            print item_str
+            continue
+        elif data == 1:
+            rrd = cur.fetchall()
+            print rrd
+        elif data == 2:
+            rrd = cur.fetchall()
+            print rrd
 
         cur.close()
         conn.close()
 
-        rrd = rrd.__str__()
-        rrd_file_path = rrd.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
-            ')').strip(',').strip("'").encode('utf-8')
-        rrd_file_list.append(rrd_file_path)
+        for item in rrd:
+            rrd_item = item.__str__()
+            rrd_file_path = rrd_item.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(')').strip(',').strip("'").encode('utf-8')
+            if os.path.exists(rrd_file_path):
+                rrd_file_list.append(rrd_file_path)
+            else:
+                print rrd_file_path
+                continue
+    print rrd_file_list
 
     fetch_result_list_max = []
     fetch_result_list_average = []
@@ -510,8 +521,6 @@ def handle_api(request,date,host,operator,compute,area):
         fetch_result_list_max.append(fetch_result_max)
         fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), str('-s' + ' ' + start_timestamp), str('-e' + ' ' + end_timestamp))
         fetch_result_list_average.append(fetch_result_average)
-        print fetch_result_list_max
-        print fetch_result_list_average
 
     traffic_list_MAX = []
     traffic_list_AVERAGE = []
@@ -568,8 +577,6 @@ def handle_area_api(request,date,host,operator,compute,area):
     xiao = [4,6,9,11]
     month_s = str(date.split('-')[1:]).strip('[]').strip("u").strip("'").encode('utf-8')
     year_s = str(date.split('-')[:1]).strip('[]').strip("u").strip("'").encode('utf-8')
-    print year_s
-    print month_s
     if month_s.startswith('0'):
         month_s = month_s[1:]
     if int(month_s) in da:
@@ -601,15 +608,29 @@ def handle_area_api(request,date,host,operator,compute,area):
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
             item_str, operator_1)
         data = cur.execute(sql)
-        rrd = cur.fetchall()
+        if data == 0:
+            print item_str
+            continue
+        elif data == 1:
+            rrd = cur.fetchall()
+            print rrd
+        elif data == 2:
+            rrd = cur.fetchall()
+            print rrd
 
         cur.close()
         conn.close()
 
-        rrd = rrd.__str__()
-        rrd_file_path = rrd.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
-            ')').strip(',').strip("'").encode('utf-8')
-        rrd_file_list.append(rrd_file_path)
+        for item in rrd:
+            rrd_item = item.__str__()
+            rrd_file_path = rrd_item.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
+                ')').strip(',').strip("'").encode('utf-8')
+            if os.path.exists(rrd_file_path):
+                rrd_file_list.append(rrd_file_path)
+            else:
+                print rrd_file_path
+                continue
+    print rrd_file_list
 
     fetch_result_list_max = []
     fetch_result_list_average = []
@@ -674,8 +695,6 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
     xiao = [4,6,9,11]
     month_s = str(date.split('-')[1:]).strip('[]').strip("u").strip("'").encode('utf-8')
     year_s = str(date.split('-')[:1]).strip('[]').strip("u").strip("'").encode('utf-8')
-    print year_s
-    print month_s
     if month_s.startswith('0'):
         month_s = month_s[1:]
     if int(month_s) in da:
@@ -708,15 +727,29 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
             item_str, operator_1)
         data = cur.execute(sql)
-        rrd = cur.fetchall()
+        if data == 0:
+            print item_str
+            continue
+        elif data == 1:
+            rrd = cur.fetchall()
+            print rrd
+        elif data == 2:
+            rrd = cur.fetchall()
+            print rrd
 
         cur.close()
         conn.close()
 
-        rrd = rrd.__str__()
-        rrd_file_path = rrd.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
-            ')').strip(',').strip("'").encode('utf-8')
-        rrd_file_list.append(rrd_file_path)
+        for item in rrd:
+            rrd_item = item.__str__()
+            rrd_file_path = rrd_item.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
+                ')').strip(',').strip("'").encode('utf-8')
+            if os.path.exists(rrd_file_path):
+                rrd_file_list.append(rrd_file_path)
+            else:
+                print rrd_file_path
+                continue
+    print rrd_file_list
 
     fetch_result_list_max = []
     fetch_result_list_average = []
