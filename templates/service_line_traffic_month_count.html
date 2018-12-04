@@ -43,6 +43,10 @@
                     var BGP_cdn_max_percent = JSON.parse(data).BGP_cdn_max_percent;
                     var BGP_test_max_percent = JSON.parse(data).BGP_test_max_percent;
                     var BGP_usercenter_max_percent = JSON.parse(data).BGP_usercenter_max_percent;
+                    var BGP_fourA_max_percent = JSON.parse(data).BGP_fourA_max_percent;
+                    var BGP_monitor_max_percent = JSON.parse(data).BGP_monitor_max_percent;
+                    var BGP_free_max_percent = JSON.parse(data).BGP_free_max_percent;
+                    var BGP_website_max_percent = JSON.parse(data).BGP_website_max_percent;
                     if (return_BGP_data == 'null'){
                         $("#container_BGP_max").html('BGP max data is null')
                     }else {
@@ -93,6 +97,18 @@
                                 }, {
                                     name: '用户中心',
                                     y: BGP_usercenter_max_percent
+                                }, {
+                                    name: '4A',
+                                    y: BGP_fourA_max_percent
+                                }, {
+                                    name: '监控',
+                                    y: BGP_monitor_max_percent
+                                }, {
+                                    name: '空闲',
+                                    y: BGP_free_max_percent
+                                }, {
+                                    name: '网站',
+                                    y: BGP_website_max_percent
                                 }]
                             }]
                     });
@@ -114,6 +130,10 @@
                     var BGP_cdn_average_percent = JSON.parse(data).BGP_cdn_average_percent;
                     var BGP_test_average_percent = JSON.parse(data).BGP_test_average_percent;
                     var BGP_usercenter_average_percent = JSON.parse(data).BGP_usercenter_average_percent;
+                    var BGP_fourA_average_percent = JSON.parse(data).BGP_fourA_average_percent;
+                    var BGP_monitor_average_percent = JSON.parse(data).BGP_monitor_average_percent;
+                    var BGP_free_average_percent = JSON.parse(data).BGP_free_average_percent;
+                    var BGP_website_average_percent = JSON.parse(data).BGP_website_average_percent;
                     if (return_BGP_data == 'null'){
                         $("#container_BGP_average").html('BGP average data is null')
                     }else{
@@ -164,6 +184,18 @@
                                 }, {
                                     name: '用户中心',
                                     y: BGP_usercenter_average_percent
+                                }, {
+                                    name: '4A',
+                                    y: BGP_fourA_average_percent
+                                }, {
+                                    name: '监控',
+                                    y: BGP_monitor_average_percent
+                                }, {
+                                    name: '空闲',
+                                    y: BGP_free_average_percent
+                                }, {
+                                    name: '网站',
+                                    y: BGP_website_average_percent
                                 }]
                             }]
                     });
@@ -185,6 +217,8 @@
                     var LT_cdn_max_percent = JSON.parse(data).LT_cdn_max_percent;
                     var LT_test_max_percent = JSON.parse(data).LT_test_max_percent;
                     var LT_usercenter_max_percent = JSON.parse(data).LT_usercenter_max_percent;
+                    var LT_website_max_percent = JSON.parse(data).LT_website_max_percent;
+                    var LT_cloudstorage_max_percent = JSON.parse(data).LT_cloudstorage_max_percent;
                     if (return_LT_data == 'null'){
                         $("#container_LT_max").html('LT max data is null')
                     }else{
@@ -232,6 +266,12 @@
                                 }, {
                                     name: '测试',
                                     y: LT_test_max_percent
+                                }, {
+                                    name: '网站',
+                                    y: LT_website_max_percent
+                                }, {
+                                    name: '云存储',
+                                    y: LT_cloudstorage_max_percent
                                 }]
                             }]
                     });
@@ -253,6 +293,8 @@
                     var LT_cdn_average_percent = JSON.parse(data).LT_cdn_average_percent;
                     var LT_test_average_percent = JSON.parse(data).LT_test_average_percent;
                     var LT_usercenter_average_percent = JSON.parse(data).LT_usercenter_average_percent;
+                    var LT_website_average_percent = JSON.parse(data).LT_website_average_percent;
+                    var LT_cloudstorage_average_percent = JSON.parse(data).LT_cloudstorage_average_percent;
                     if (return_LT_data == 'null'){
                         $("#container_LT_average").html('LT average data is null')
                     }else{
@@ -300,6 +342,12 @@
                                 }, {
                                     name: '测试',
                                     y: LT_test_average_percent
+                                }, {
+                                    name: '网站',
+                                    y: LT_website_average_percent
+                                }, {
+                                    name: '云存储',
+                                    y: LT_cloudstorage_average_percent
                                 }]
                             }]
                     });
@@ -321,6 +369,8 @@
                     var DX_cdn_max_percent = JSON.parse(data).DX_cdn_max_percent;
                     var DX_test_max_percent = JSON.parse(data).DX_test_max_percent;
                     var DX_usercenter_max_percent = JSON.parse(data).DX_usercenter_max_percent;
+                    var DX_website_max_percent = JSON.parse(data).DX_website_max_percent;
+                    var DX_cloudstorage_max_percent = JSON.parse(data).DX_cloudstorage_max_percent;
                     if (return_DX_data == 'null'){
                         $("#container_DX_max").html('DX max data is null')
                     }else{
@@ -368,6 +418,12 @@
                                 }, {
                                     name: '测试',
                                     y: DX_test_max_percent
+                                }, {
+                                    name: '网站',
+                                    y: DX_website_max_percent
+                                }, {
+                                    name: '云存储',
+                                    y: DX_cloudstorage_max_percent
                                 }]
                             }]
                     });
@@ -389,6 +445,8 @@
                     var DX_cdn_average_percent = JSON.parse(data).DX_cdn_average_percent;
                     var DX_test_average_percent = JSON.parse(data).DX_test_average_percent;
                     var DX_usercenter_average_percent = JSON.parse(data).DX_usercenter_average_percent;
+                    var DX_website_average_percent = JSON.parse(data).DX_website_average_percent;
+                    var DX_cloudstorage_average_percent = JSON.parse(data).DX_cloudstorage_average_percent;
                     if (return_DX_data == 'null'){
                         $("#container_DX_average").html('DX average data is null')
                     }else{
@@ -436,6 +494,12 @@
                                 }, {
                                     name: '测试',
                                     y: DX_test_average_percent
+                                }, {
+                                    name: '网站',
+                                    y: DX_website_average_percent
+                                }, {
+                                    name: '云存储',
+                                    y: DX_cloudstorage_average_percent
                                 }]
                             }]
                     });
@@ -457,6 +521,7 @@
                     var YD_cdn_max_percent = JSON.parse(data).YD_cdn_max_percent;
                     var YD_test_max_percent = JSON.parse(data).YD_test_max_percent;
                     var YD_usercenter_max_percent = JSON.parse(data).YD_usercenter_max_percent;
+                    var YD_website_max_percent = JSON.parse(data).YD_website_max_percent;
                     if (return_YD_data == 'null'){
                         $("#container_YD_max").html('YD max data is null')
                     }else{
@@ -504,6 +569,9 @@
                                 }, {
                                     name: '测试',
                                     y: YD_test_max_percent
+                                }, {
+                                    name: '网站',
+                                    y: YD_website_max_percent
                                 }]
                             }]
                     });
@@ -525,6 +593,7 @@
                     var YD_cdn_average_percent = JSON.parse(data).YD_cdn_average_percent;
                     var YD_test_average_percent = JSON.parse(data).YD_test_average_percent;
                     var YD_usercenter_average_percent = JSON.parse(data).YD_usercenter_average_percent;
+                    var YD_website_average_percent = JSON.parse(data).YD_website_average_percent;
                     if (return_YD_data == 'null'){
                         $("#container_YD_average").html('YD average data is null')
                     }else{
@@ -572,6 +641,9 @@
                                 }, {
                                     name: '测试',
                                     y: YD_test_average_percent
+                                }, {
+                                    name: '网站',
+                                    y: YD_website_average_percent
                                 }]
                             }]
                     });

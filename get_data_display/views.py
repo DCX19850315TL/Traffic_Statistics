@@ -289,8 +289,6 @@ def get_service_line_api_data(request):
     DX_average_count_list = []
     YD_max_count_list = []
     YD_average_count_list = []
-    BGP_ptop_max_percent = []
-    BGP_ptop_average_percent = []
 
     all_data = models.Service_line_month_count.objects.all().order_by('create_time')
     all_data_s = serializers.serialize("json", all_data)
@@ -334,6 +332,26 @@ def get_service_line_api_data(request):
                 usercenter_BGP_average_data = item['fields']['average_value']
                 BGP_max_count_list.append(usercenter_BGP_max_data)
                 BGP_average_count_list.append(usercenter_BGP_average_data)
+            elif item_operator_data == 'BGP' and item_service_line_data == 'fourA':
+                fourA_BGP_max_data = item['fields']['max_value']
+                fourA_BGP_average_data = item['fields']['average_value']
+                BGP_max_count_list.append(fourA_BGP_max_data)
+                BGP_average_count_list.append(fourA_BGP_average_data)
+            elif item_operator_data == 'BGP' and item_service_line_data == 'monitor':
+                monitor_BGP_max_data = item['fields']['max_value']
+                monitor_BGP_average_data = item['fields']['average_value']
+                BGP_max_count_list.append(monitor_BGP_max_data)
+                BGP_average_count_list.append(monitor_BGP_average_data)
+            elif item_operator_data == 'BGP' and item_service_line_data == 'free':
+                free_BGP_max_data = item['fields']['max_value']
+                free_BGP_average_data = item['fields']['average_value']
+                BGP_max_count_list.append(free_BGP_max_data)
+                BGP_average_count_list.append(free_BGP_average_data)
+            elif item_operator_data == 'BGP' and item_service_line_data == 'website':
+                website_BGP_max_data = item['fields']['max_value']
+                website_BGP_average_data = item['fields']['average_value']
+                BGP_max_count_list.append(website_BGP_max_data)
+                BGP_average_count_list.append(website_BGP_average_data)
             elif item_operator_data == 'LT' and item_service_line_data == 'ptop':
                 ptop_LT_max_data = item['fields']['max_value']
                 ptop_LT_average_data = item['fields']['average_value']
@@ -359,6 +377,16 @@ def get_service_line_api_data(request):
                 usercenter_LT_average_data = item['fields']['average_value']
                 LT_max_count_list.append(usercenter_LT_max_data)
                 LT_average_count_list.append(usercenter_LT_average_data)
+            elif item_operator_data == 'LT' and item_service_line_data == 'website':
+                website_LT_max_data = item['fields']['max_value']
+                website_LT_average_data = item['fields']['average_value']
+                LT_max_count_list.append(website_LT_max_data)
+                LT_average_count_list.append(website_LT_average_data)
+            elif item_operator_data == 'LT' and item_service_line_data == 'cloudstorage':
+                cloudstorage_LT_max_data = item['fields']['max_value']
+                cloudstorage_LT_average_data = item['fields']['average_value']
+                LT_max_count_list.append(cloudstorage_LT_max_data)
+                LT_average_count_list.append(cloudstorage_LT_average_data)
             elif item_operator_data == 'DX' and item_service_line_data == 'ptop':
                 ptop_DX_max_data = item['fields']['max_value']
                 ptop_DX_average_data = item['fields']['average_value']
@@ -384,6 +412,16 @@ def get_service_line_api_data(request):
                 usercenter_DX_average_data = item['fields']['average_value']
                 DX_max_count_list.append(usercenter_DX_max_data)
                 DX_average_count_list.append(usercenter_DX_average_data)
+            elif item_operator_data == 'DX' and item_service_line_data == 'website':
+                website_DX_max_data = item['fields']['max_value']
+                website_DX_average_data = item['fields']['average_value']
+                DX_max_count_list.append(website_DX_max_data)
+                DX_average_count_list.append(website_DX_average_data)
+            elif item_operator_data == 'DX' and item_service_line_data == 'cloudstorage':
+                cloudstorage_DX_max_data = item['fields']['max_value']
+                cloudstorage_DX_average_data = item['fields']['average_value']
+                DX_max_count_list.append(cloudstorage_DX_max_data)
+                DX_average_count_list.append(cloudstorage_DX_average_data)
             elif item_operator_data == 'YD' and item_service_line_data == 'ptop':
                 ptop_YD_max_data = item['fields']['max_value']
                 ptop_YD_average_data = item['fields']['average_value']
@@ -409,6 +447,11 @@ def get_service_line_api_data(request):
                 usercenter_YD_average_data = item['fields']['average_value']
                 YD_max_count_list.append(usercenter_YD_max_data)
                 YD_average_count_list.append(usercenter_YD_average_data)
+            elif item_operator_data == 'YD' and item_service_line_data == 'website':
+                website_YD_max_data = item['fields']['max_value']
+                website_YD_average_data = item['fields']['average_value']
+                YD_max_count_list.append(website_YD_max_data)
+                YD_average_count_list.append(website_YD_average_data)
     data_dit = {"month": month_data_list,"last_month":last_month_s}
     if len(BGP_max_count_list) == 0 or len(BGP_average_count_list)  == 0:
         data_dit['BGP_data']='null'
@@ -423,7 +466,15 @@ def get_service_line_api_data(request):
         BGP_test_average_percent = round(test_BGP_average_data / sum(BGP_average_count_list) * 100, 2)
         BGP_usercenter_max_percent = round(usercenter_BGP_max_data / sum(BGP_max_count_list) * 100, 2)
         BGP_usercenter_average_percent = round(usercenter_BGP_average_data / sum(BGP_average_count_list) * 100, 2)
-        BGP_dit = {"BGP_ptop_max_percent":BGP_ptop_max_percent,"BGP_ptop_average_percent":BGP_ptop_average_percent,"BGP_meeting_max_percent":BGP_meeting_max_percent,"BGP_meeting_average_percent":BGP_meeting_average_percent,"BGP_cdn_max_percent":BGP_cdn_max_percent,"BGP_cdn_average_percent":BGP_cdn_average_percent,"BGP_test_max_percent":BGP_test_max_percent,"BGP_test_average_percent":BGP_test_average_percent,"BGP_usercenter_max_percent":BGP_usercenter_max_percent,"BGP_usercenter_average_percent":BGP_usercenter_average_percent}
+        BGP_fourA_max_percent = round(fourA_BGP_max_data / sum(BGP_max_count_list) * 100, 2)
+        BGP_fourA_average_percent = round(fourA_BGP_average_data / sum(BGP_average_count_list) * 100, 2)
+        BGP_monitor_max_percent = round(monitor_BGP_max_data / sum(BGP_max_count_list) * 100, 2)
+        BGP_monitor_average_percent = round(monitor_BGP_average_data / sum(BGP_average_count_list) * 100, 2)
+        BGP_free_max_percent = round(free_BGP_max_data / sum(BGP_max_count_list) * 100, 2)
+        BGP_free_average_percent = round(free_BGP_average_data / sum(BGP_average_count_list) * 100, 2)
+        BGP_website_max_percent = round(website_BGP_max_data / sum(BGP_max_count_list) * 100, 2)
+        BGP_website_average_percent = round(website_BGP_average_data / sum(BGP_average_count_list) * 100, 2)
+        BGP_dit = {"BGP_ptop_max_percent":BGP_ptop_max_percent,"BGP_ptop_average_percent":BGP_ptop_average_percent,"BGP_meeting_max_percent":BGP_meeting_max_percent,"BGP_meeting_average_percent":BGP_meeting_average_percent,"BGP_cdn_max_percent":BGP_cdn_max_percent,"BGP_cdn_average_percent":BGP_cdn_average_percent,"BGP_test_max_percent":BGP_test_max_percent,"BGP_test_average_percent":BGP_test_average_percent,"BGP_usercenter_max_percent":BGP_usercenter_max_percent,"BGP_usercenter_average_percent":BGP_usercenter_average_percent,"BGP_fourA_max_percent":BGP_fourA_max_percent,"BGP_fourA_average_percent":BGP_fourA_average_percent,"BGP_monitor_max_percent":BGP_monitor_max_percent,"BGP_monitor_average_percent":BGP_monitor_average_percent,"BGP_free_max_percent":BGP_free_max_percent,"BGP_free_average_percent":BGP_free_average_percent,"BGP_website_max_percent":BGP_website_max_percent,"BGP_website_average_percent":BGP_website_average_percent}
         data_dit.update(BGP_dit)
     if len(LT_max_count_list) == 0 or len(LT_average_count_list) == 0:
         data_dit['LT_data'] = 'null'
@@ -438,7 +489,11 @@ def get_service_line_api_data(request):
         LT_test_average_percent = round(test_LT_average_data / sum(LT_average_count_list) * 100, 2)
         LT_usercenter_max_percent = round(usercenter_LT_max_data / sum(LT_max_count_list) * 100, 2)
         LT_usercenter_average_percent = round(usercenter_LT_average_data / sum(LT_average_count_list) * 100, 2)
-        LT_dit = {"LT_ptop_max_percent":LT_ptop_max_percent,"LT_ptop_average_percent":LT_ptop_average_percent,"LT_meeting_max_percent":LT_meeting_max_percent,"LT_meeting_average_percent":LT_meeting_average_percent,"LT_cdn_max_percent":LT_cdn_max_percent,"LT_cdn_average_percent":LT_cdn_average_percent,"LT_test_max_percent":LT_test_max_percent,"LT_test_average_percent":LT_test_average_percent,"LT_usercenter_max_percent":LT_usercenter_max_percent,"LT_usercenter_average_percent":LT_usercenter_average_percent}
+        LT_website_max_percent = round(website_LT_max_data / sum(LT_max_count_list) * 100, 2)
+        LT_website_average_percent = round(website_LT_average_data / sum(LT_average_count_list) * 100, 2)
+        LT_cloudstorage_max_percent = round(cloudstorage_LT_max_data / sum(LT_max_count_list) * 100, 2)
+        LT_cloudstorage_average_percent = round(cloudstorage_LT_average_data / sum(LT_average_count_list) * 100, 2)
+        LT_dit = {"LT_ptop_max_percent":LT_ptop_max_percent,"LT_ptop_average_percent":LT_ptop_average_percent,"LT_meeting_max_percent":LT_meeting_max_percent,"LT_meeting_average_percent":LT_meeting_average_percent,"LT_cdn_max_percent":LT_cdn_max_percent,"LT_cdn_average_percent":LT_cdn_average_percent,"LT_test_max_percent":LT_test_max_percent,"LT_test_average_percent":LT_test_average_percent,"LT_usercenter_max_percent":LT_usercenter_max_percent,"LT_usercenter_average_percent":LT_usercenter_average_percent,"LT_website_max_percent":LT_website_max_percent,"LT_website_average_percent":LT_website_average_percent,"LT_cloudstorage_max_percent":LT_cloudstorage_max_percent,"LT_cloudstorage_average_percent":LT_cloudstorage_average_percent}
         data_dit.update(LT_dit)
     if len(DX_max_count_list) == 0 or len(DX_average_count_list) == 0:
         data_dit['DX_data'] = 'null'
@@ -453,7 +508,11 @@ def get_service_line_api_data(request):
         DX_test_average_percent = round(test_DX_average_data / sum(DX_average_count_list) * 100, 2)
         DX_usercenter_max_percent = round(usercenter_DX_max_data / sum(DX_max_count_list) * 100, 2)
         DX_usercenter_average_percent = round(usercenter_DX_average_data / sum(DX_average_count_list) * 100, 2)
-        DX_dit = {"DX_ptop_max_percent":DX_ptop_max_percent,"DX_ptop_average_percent":DX_ptop_average_percent,"DX_meeting_max_percent":DX_meeting_max_percent,"DX_meeting_average_percent":DX_meeting_average_percent,"DX_cdn_max_percent":DX_cdn_max_percent,"DX_cdn_average_percent":DX_cdn_average_percent,"DX_test_max_percent":DX_test_max_percent,"DX_test_average_percent":DX_test_average_percent,"DX_usercenter_max_percent":DX_usercenter_max_percent,"DX_usercenter_average_percent":DX_usercenter_average_percent}
+        DX_website_max_percent = round(website_DX_max_data / sum(DX_max_count_list) * 100, 2)
+        DX_website_average_percent = round(website_DX_average_data / sum(DX_average_count_list) * 100, 2)
+        DX_cloudstorage_max_percent = round(cloudstorage_DX_max_data / sum(DX_max_count_list) * 100, 2)
+        DX_cloudstorage_average_percent = round(cloudstorage_DX_average_data / sum(DX_average_count_list) * 100, 2)
+        DX_dit = {"DX_ptop_max_percent":DX_ptop_max_percent,"DX_ptop_average_percent":DX_ptop_average_percent,"DX_meeting_max_percent":DX_meeting_max_percent,"DX_meeting_average_percent":DX_meeting_average_percent,"DX_cdn_max_percent":DX_cdn_max_percent,"DX_cdn_average_percent":DX_cdn_average_percent,"DX_test_max_percent":DX_test_max_percent,"DX_test_average_percent":DX_test_average_percent,"DX_usercenter_max_percent":DX_usercenter_max_percent,"DX_usercenter_average_percent":DX_usercenter_average_percent,"DX_website_max_percent":DX_website_max_percent,"DX_website_average_percent":DX_website_average_percent,"DX_cloudstorage_max_percent":DX_cloudstorage_max_percent,"DX_cloudstorage_average_percent":DX_cloudstorage_average_percent}
         data_dit.update(DX_dit)
     if len(YD_max_count_list) == 0 or len(YD_average_count_list) == 0:
         data_dit['YD_data'] = 'null'
@@ -468,7 +527,9 @@ def get_service_line_api_data(request):
         YD_test_average_percent = round(test_YD_average_data / sum(YD_average_count_list) * 100, 2)
         YD_usercenter_max_percent = round(usercenter_YD_max_data / sum(YD_max_count_list) * 100, 2)
         YD_usercenter_average_percent = round(usercenter_YD_average_data / sum(YD_average_count_list) * 100, 2)
-        YD_dit = {"YD_ptop_max_percent":YD_ptop_max_percent,"YD_ptop_average_percent":YD_ptop_average_percent,"YD_meeting_max_percent":YD_meeting_max_percent,"YD_meeting_average_percent":YD_meeting_average_percent,"YD_cdn_max_percent":YD_cdn_max_percent,"YD_cdn_average_percent":YD_cdn_average_percent,"YD_test_max_percent":YD_test_max_percent,"YD_test_average_percent":YD_test_average_percent,"YD_usercenter_max_percent":YD_usercenter_max_percent,"YD_usercenter_average_percent":YD_usercenter_average_percent}
+        YD_website_max_percent = round(website_YD_max_data / sum(YD_max_count_list) * 100, 2)
+        YD_website_average_percent = round(website_YD_average_data / sum(YD_average_count_list) * 100, 2)
+        YD_dit = {"YD_ptop_max_percent":YD_ptop_max_percent,"YD_ptop_average_percent":YD_ptop_average_percent,"YD_meeting_max_percent":YD_meeting_max_percent,"YD_meeting_average_percent":YD_meeting_average_percent,"YD_cdn_max_percent":YD_cdn_max_percent,"YD_cdn_average_percent":YD_cdn_average_percent,"YD_test_max_percent":YD_test_max_percent,"YD_test_average_percent":YD_test_average_percent,"YD_usercenter_max_percent":YD_usercenter_max_percent,"YD_usercenter_average_percent":YD_usercenter_average_percent,"YD_website_max_percent":YD_website_max_percent,"YD_website_average_percent":YD_website_average_percent}
         data_dit.update(YD_dit)
 
     return HttpResponse(json.dumps(data_dit))
