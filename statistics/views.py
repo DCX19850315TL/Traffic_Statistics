@@ -239,6 +239,8 @@ def handle(request):
         fetch_result_list = []
         fetch_result_list_max = []
         fetch_result_list_average = []
+        fetch_result_dict_count = {}
+
         if compute_type_str == 'ALL':
             for item in rrd_file_list:
                 start_time_stamp_rrd = str('-s'+' '+start_time_stamp)
@@ -247,13 +249,58 @@ def handle(request):
                 fetch_result_list_max.append(fetch_result_max)
                 fetch_result_average = rrdtool.fetch(item,str('AVERAGE'),start_time_stamp_rrd,end_time_stamp_rrd)
                 fetch_result_list_average.append(fetch_result_average)
-
+            print fetch_result_list_max
+            print fetch_result_list_average
         else:
             for item in rrd_file_list:
                 start_time_stamp_rrd = str('-s'+' '+start_time_stamp)
                 end_time_stamp_rrd = str('-e'+' '+end_time_stamp)
                 fetch_result = rrdtool.fetch(item,compute_type_str,start_time_stamp_rrd,end_time_stamp_rrd)
                 fetch_result_list.append(fetch_result)
+                fetch_result_dict = {item:fetch_result}
+                fetch_result_dict_count.update(fetch_result_dict)
+
+            traffic_count_list = []
+            for k,v in fetch_result_dict_count.items():
+
+                traffic_count_list.append(v[2])
+
+            list_num = len(traffic_count_list[0])
+            list_count_num = len(traffic_count_list)
+
+            traffic_list_new = []
+            traffic_list_new2 = []
+            for i in range(list_count_num):
+                for j in range(list_num):
+                    traffic_in = traffic_count_list[i][j][0]
+                    traffic_out = traffic_count_list[i][j][1]
+                    if traffic_in is None and traffic_out is None:
+                        traffic_list_new.append(float(0))
+                    elif traffic_in > traffic_out:
+                        traffic_list_new.append(traffic_in)
+                    else:
+                        traffic_list_new.append(traffic_out)
+                    traffic_dit={i:traffic_list_new}
+
+                traffic_list_new2.append(traffic_dit)
+                traffic_list_new = []
+
+            traffic_list_new3 = []
+            traffic_list_new4 = []
+            for i in range(list_num):
+                for j in range(list_count_num):
+                    traffic_0 = traffic_list_new2[j][j][i]
+                    traffic_list_new3.append(traffic_0)
+                traffic_dit2={i:traffic_list_new3}
+                traffic_list_new3 = []
+                traffic_list_new4.append(traffic_dit2)
+
+            traffic_list_new5 = []
+            for i in range(list_num):
+                traffic_1 = traffic_list_new4[i][i]
+                traffic_1_sum = sum(traffic_1)
+                traffic_list_new5.append(traffic_1_sum)
+            print traffic_list_new5
 
         traffic_list = []
         traffic_list_count = []
@@ -800,5 +847,220 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
     traffic_list_count_AVERAGE_sum = sum(traffic_list_count_AVERAGE)
 
     models.Service_line_month_count.objects.create(service_line=service_line_s,area=area_s,operator=operator.encode('utf-8'),month=year_s+'/'+month_s,max_value=traffic_list_count_MAX_sum,average_value=traffic_list_count_AVERAGE_sum)
+
+    return HttpResponse('ok')
+
+def handle_api_new(request,date,host,operator,compute,area):
+
+    print date, host, operator, compute, area
+
+    print request.method
+
+    start_time_h = "00:00:00"
+    end_time_h = "23:59:59"
+    da = [1, 3, 5, 7, 8, 10, 12]
+    xiao = [4, 6, 9, 11]
+    month_s = str(date.split('-')[1:]).strip('[]').strip("u").strip("'").encode('utf-8')
+    year_s = str(date.split('-')[:1]).strip('[]').strip("u").strip("'").encode('utf-8')
+    if month_s.startswith('0'):
+        month_s = month_s[1:]
+    if int(month_s) in da:
+        day_s = '31'
+    elif int(month_s) in xiao:
+        day_s = '30'
+    else:
+        if int(year_s) % 400 == 0 or (int(year_s) % 4 == 0 and int(year_s) % 100 != 0):
+            day_s = '29'
+        else:
+            day_s = '28'
+    start_time = year_s + '-' + month_s + '-' + '1' + ' ' + start_time_h
+    end_time = year_s + '-' + month_s + '-' + day_s + ' ' + end_time_h
+    start_timestamp = time.strptime(start_time, "%Y-%m-%d %H:%M:%S")
+    start_timestamp = str(int(time.mktime(start_timestamp)))
+    end_timestamp = time.strptime(end_time, "%Y-%m-%d %H:%M:%S")
+    end_timestamp = str(int(time.mktime(end_timestamp)))
+    host_list = host.split('+')
+    operator_1 = '- ' + operator.encode('utf-8')
+    area_s = area.encode('utf-8')
+
+    rrd_file_list = []
+    for item in host_list:
+        item_str = item.encode('utf-8')
+
+        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        cur = conn.cursor()
+
+        sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
+            item_str, operator_1)
+        data = cur.execute(sql)
+        if data == 0:
+            print item_str
+            continue
+        elif data == 1:
+            rrd = cur.fetchall()
+            print rrd
+        elif data == 2:
+            rrd = cur.fetchall()
+            print rrd
+
+        cur.close()
+        conn.close()
+
+        for item in rrd:
+            rrd_item = item.__str__()
+            rrd_file_path = rrd_item.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
+                ')').strip(',').strip("'").encode('utf-8')
+            if os.path.exists(rrd_file_path):
+                rrd_file_list.append(rrd_file_path)
+            else:
+                print rrd_file_path
+                continue
+    print rrd_file_list
+
+    # 通过rrdtool查询rrd数据
+    fetch_result_list = []
+    fetch_result_list_max = []
+    fetch_result_list_average = []
+    fetch_result_dict_max_count = {}
+    fetch_result_dict_average_count = {}
+
+    for item in rrd_file_list:
+        start_time_stamp_rrd = str('-s' + ' ' + start_timestamp)
+        end_time_stamp_rrd = str('-e' + ' ' + end_timestamp)
+        fetch_result_max = rrdtool.fetch(item, str('MAX'), start_time_stamp_rrd, end_time_stamp_rrd)
+        fetch_result_list_max.append(fetch_result_max)
+        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), start_time_stamp_rrd, end_time_stamp_rrd)
+        fetch_result_list_average.append(fetch_result_average)
+        fetch_result_dict_max = {item: fetch_result_max}
+        fetch_result_dict_max_count.update(fetch_result_dict_max)
+        fetch_result_dict_average = {item: fetch_result_average}
+        fetch_result_dict_average_count.update(fetch_result_dict_average)
+
+    #将每个主机的流量添加到一个新的列表
+    traffic_count_list_max = []
+    for k, v in fetch_result_dict_max_count.items():
+        traffic_count_list_max.append(v[2])
+    traffic_count_list_average = []
+    for k, v in fetch_result_dict_average_count.items():
+        traffic_count_list_average.append(v[2])
+
+    #每台主机列表的个数和总共的列表个数
+    list_num = len(traffic_count_list_max[0])
+    list_count_num = len(traffic_count_list_max)
+
+    #将进出流量的大值放到新的列表中
+    traffic_list_new_max = []
+    traffic_list_new2_max = []
+    for i in range(list_count_num):
+        for j in range(list_num):
+            traffic_in = traffic_count_list_max[i][j][0]
+            traffic_out = traffic_count_list_max[i][j][1]
+            if traffic_in is None and traffic_out is None:
+                traffic_list_new_max.append(float(0))
+            elif traffic_in > traffic_out:
+                traffic_list_new_max.append(traffic_in)
+            else:
+                traffic_list_new_max.append(traffic_out)
+            traffic_dit = {i: traffic_list_new_max}
+
+        traffic_list_new2_max.append(traffic_dit)
+        traffic_list_new_max = []
+
+    traffic_list_new_average = []
+    traffic_list_new2_average = []
+    for i in range(list_count_num):
+        for j in range(list_num):
+            traffic_in = traffic_count_list_average[i][j][0]
+            traffic_out = traffic_count_list_average[i][j][1]
+            if traffic_in is None and traffic_out is None:
+                traffic_list_new_average.append(float(0))
+            elif traffic_in > traffic_out:
+                traffic_list_new_average.append(traffic_in)
+            else:
+                traffic_list_new_average.append(traffic_out)
+            traffic_dit = {i: traffic_list_new_average}
+
+        traffic_list_new2_average.append(traffic_dit)
+        traffic_list_new_average = []
+
+    #按顺序将每台主机的同一行的数据放到一个新的列表
+    traffic_list_new3_max = []
+    traffic_list_new4_max = []
+    for i in range(list_num):
+        for j in range(list_count_num):
+            traffic_0 = traffic_list_new2_max[j][j][i]
+            traffic_list_new3_max.append(traffic_0)
+        traffic_dit2 = {i: traffic_list_new3_max}
+        traffic_list_new3_max = []
+        traffic_list_new4_max.append(traffic_dit2)
+
+    traffic_list_new3_average = []
+    traffic_list_new4_average = []
+    for i in range(list_num):
+        for j in range(list_count_num):
+            traffic_0 = traffic_list_new2_average[j][j][i]
+            traffic_list_new3_average.append(traffic_0)
+        traffic_dit2 = {i: traffic_list_new3_average}
+        traffic_list_new3_average = []
+        traffic_list_new4_average.append(traffic_dit2)
+
+    #将所有主机的同一条数据进行加运算后放到最终的列表中
+    traffic_list_new5_max = []
+    for i in range(list_num):
+        traffic_1 = traffic_list_new4_max[i][i]
+        traffic_1_sum = sum(traffic_1)
+        traffic_list_new5_max.append(traffic_1_sum)
+    print traffic_list_new5_max
+
+    traffic_list_new5_average = []
+    for i in range(list_num):
+        traffic_1 = traffic_list_new4_average[i][i]
+        traffic_1_sum = sum(traffic_1)
+        traffic_list_new5_average.append(traffic_1_sum)
+    print traffic_list_new5_average
+
+    traffic_list_MAX = []
+    traffic_list_AVERAGE = []
+    traffic_list_count_MAX = []
+    traffic_list_count_AVERAGE = []
+    for item in fetch_result_list_max:
+        for items in item[2]:
+            if items[0] is None and items[1] is None:
+                traffic = float(0)
+            elif items[0] > items[1]:
+                traffic = items[0] * 8
+            elif items[0] < items[1]:
+                traffic = items[1] * 8
+            else:
+                traffic = items[0] * 8
+            traffic_list_MAX.append(traffic)
+        traffic_max = round(max(traffic_list_MAX) / float(1024) / float(1024), 2)
+        traffic_list_count_MAX.append(traffic_max)
+        traffic_list_MAX = []
+
+    traffic_list_count_MAX_sum = sum(traffic_list_count_MAX)
+
+    for item in fetch_result_list_average:
+        for items in item[2]:
+            if items[0] is None and items[1] is None:
+                traffic = float(0)
+            elif items[0] > items[1]:
+                traffic = items[0] * 8
+            elif items[0] < items[1]:
+                traffic = items[1] * 8
+            else:
+                traffic = items[0] * 8
+            traffic_list_AVERAGE.append(traffic)
+        traffic_sum = sum(traffic_list_AVERAGE)
+        traffic_list_len = float(len(traffic_list_AVERAGE))
+        traffic_average = round(traffic_sum / traffic_list_len / float(1024) / float(1024), 2)
+        traffic_list_count_AVERAGE.append(traffic_average)
+        traffic_list_AVERAGE = []
+
+    traffic_list_count_AVERAGE_sum = sum(traffic_list_count_AVERAGE)
+
+    models.Operator_month_count.objects.create(operator=operator.encode('utf-8'), month=year_s + '/' + month_s,
+                                               max_value=traffic_list_count_MAX_sum,
+                                               average_value=traffic_list_count_AVERAGE_sum, comment=area_s)
 
     return HttpResponse('ok')
