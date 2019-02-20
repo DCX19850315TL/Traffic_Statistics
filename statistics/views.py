@@ -1189,7 +1189,7 @@ def handle_area_api_new(request,date,host,operator,compute,area):
         list_num = len(traffic_count_list_max[0])
     else:
         list_num = max_list(data_len_list)
-    #总共的列表个数
+    # 总共的列表个数
     list_count_num = len(traffic_count_list_max)
 
     # 将进出流量的大值放到新的列表中
