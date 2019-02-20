@@ -10,13 +10,24 @@ import time
 import rrdtool
 import os,sys
 from django.core import serializers
-
-rrdpath = '/usr/local/apache2/htdocs/cacti/rra'
+from common.logger import logger
+from Traffic_Statistics.settings import RRD_PATH,DATABASES
+#配置rrd文件夹路径的变量
+rrdpath = RRD_PATH
+#配置数据库的相应变量
+DB_HOST = DATABASES['default']['HOST']
+DB_PORT = int(DATABASES['default']['PORT'])
+DB_USER = DATABASES['default']['USER']
+DB_PASSWORD = DATABASES['default']['PASSWORD']
+DB_DATABASE = DATABASES['default']['NAME']
+#配置日志文件存放目录的变量
+Logger_Info_File = logger('INFO')
+Logger_Error_File = logger('ERROR')
 
 #获取host数据在前端页面显示
 def index(request):
     try:
-        conn = MySQLdb.connect(host='192.168.137.1',port=3306,user='root',passwd='123456',db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST,port=DB_PORT,user=DB_USER,passwd=DB_PASSWORD,db=DB_DATABASE)
         cur = conn.cursor(cursorclass = MySQLdb.cursors.DictCursor)
 
         data = cur.execute('select description from host')
@@ -36,7 +47,7 @@ def index(request):
 #设置分组的页面
 def host_group(request):
 
-    conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+    conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
     cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
     data = cur.execute('select description from host where group_id is NULL')
@@ -44,9 +55,6 @@ def host_group(request):
 
     cur.close()
     conn.close()
-
-    print not_group_host_list
-    print type(not_group_host_list)
 
     group_name_list = models.Host_group.objects.all().values('group_name')
 
@@ -82,7 +90,7 @@ def add_host_to_group(request):
 
     if request.method == 'GET':
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         data = cur.execute('select description from host where group_id is NULL')
@@ -102,7 +110,7 @@ def add_host_to_group(request):
         group_name_id_only = group_name_id_json[0]['pk']
         host_list = request.POST.getlist('group_to_host_list')
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor()
 
         sql = "update host set group_id = '{0}' where description = %s".format(group_name_id_only)
@@ -123,7 +131,6 @@ def handle(request):
 
     if request.method == 'POST':
 
-        print request.POST
         host_data_out = request.POST.getlist('host_data_out')
         if host_data_out:
             host = request.POST.getlist('host_data_out')
@@ -150,7 +157,7 @@ def handle(request):
             pass
         else:
             #查询传过来的运营商ID对应的运营商名字
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor()
 
             sql = 'select operator from statistics_operator where id = %s'
@@ -168,7 +175,7 @@ def handle(request):
             pass
         else:
             #查询传过来的计算方法ID对应的计算方法
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor()
 
             sql = 'select compute from statistics_compute where id = %s'
@@ -186,7 +193,7 @@ def handle(request):
             pass
         else:
             # 查询传过来的区域ID对应的区域名字
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor()
 
             sql = 'select area from statistics_area where id = %s'
@@ -203,7 +210,7 @@ def handle(request):
             pass
         else:
             # 查询传过来的业务线ID对应的业务线名字
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor()
 
             sql = 'select service_line from statistics_service_line where id = %s'
@@ -221,7 +228,7 @@ def handle(request):
         for item in host:
             item_str = item.encode('utf-8')
 
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor()
     
             sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(item_str,operator_type_str1)
@@ -457,7 +464,7 @@ def show_operator(request):
     if request.method == 'GET':
 
         try:
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
             data = cur.execute('select * from statistics_operator')
@@ -476,7 +483,7 @@ def show_compute(request):
     if request.method == 'GET':
 
         try:
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
             data = cur.execute('select * from statistics_compute')
@@ -495,7 +502,7 @@ def show_area(request):
     if request.method == 'GET':
 
         try:
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
             data = cur.execute('select * from statistics_area')
@@ -514,7 +521,7 @@ def show_service_line(request):
     if request.method == 'GET':
 
         try:
-            conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
             cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
             data = cur.execute('select * from statistics_service_line')
@@ -529,10 +536,6 @@ def show_service_line(request):
 
 #存储运营商月统计的流量数据
 def handle_api(request,date,host,operator,compute,area):
-
-    print date,host,operator,compute,area
-
-    print request.method
 
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
@@ -565,21 +568,18 @@ def handle_api(request,date,host,operator,compute,area):
     for item in host_list:
         item_str = item.encode('utf-8')
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor()
 
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
             item_str, operator_1)
         data = cur.execute(sql)
         if data == 0:
-            print item_str
             continue
         elif data == 1:
             rrd = cur.fetchall()
-            print rrd
         elif data == 2:
             rrd = cur.fetchall()
-            print rrd
 
         cur.close()
         conn.close()
@@ -590,9 +590,7 @@ def handle_api(request,date,host,operator,compute,area):
             if os.path.exists(rrd_file_path):
                 rrd_file_list.append(rrd_file_path)
             else:
-                print rrd_file_path
                 continue
-    print rrd_file_list
 
     fetch_result_list_max = []
     fetch_result_list_average = []
@@ -649,8 +647,6 @@ def handle_api(request,date,host,operator,compute,area):
 #存储区域月统计的流量数据
 def handle_area_api(request,date,host,operator,compute,area):
 
-    print date,host,operator,compute,area
-
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
     da = [1,3,5,7,8,10,12]
@@ -682,21 +678,18 @@ def handle_area_api(request,date,host,operator,compute,area):
     for item in host_list:
         item_str = item.encode('utf-8')
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor()
 
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
             item_str, operator_1)
         data = cur.execute(sql)
         if data == 0:
-            print item_str
             continue
         elif data == 1:
             rrd = cur.fetchall()
-            print rrd
         elif data == 2:
             rrd = cur.fetchall()
-            print rrd
 
         cur.close()
         conn.close()
@@ -708,9 +701,7 @@ def handle_area_api(request,date,host,operator,compute,area):
             if os.path.exists(rrd_file_path):
                 rrd_file_list.append(rrd_file_path)
             else:
-                print rrd_file_path
                 continue
-    print rrd_file_list
 
     fetch_result_list_max = []
     fetch_result_list_average = []
@@ -767,8 +758,6 @@ def handle_area_api(request,date,host,operator,compute,area):
 #存储业务线统计的流量数据
 def handle_service_line_api(request,date,host,operator,compute,area,service_line):
 
-    print date,host,operator,compute,area,service_line
-
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
     da = [1,3,5,7,8,10,12]
@@ -801,21 +790,18 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
     for item in host_list:
         item_str = item.encode('utf-8')
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor()
 
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
             item_str, operator_1)
         data = cur.execute(sql)
         if data == 0:
-            print item_str
             continue
         elif data == 1:
             rrd = cur.fetchall()
-            print rrd
         elif data == 2:
             rrd = cur.fetchall()
-            print rrd
 
         cur.close()
         conn.close()
@@ -827,9 +813,7 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
             if os.path.exists(rrd_file_path):
                 rrd_file_list.append(rrd_file_path)
             else:
-                print rrd_file_path
                 continue
-    print rrd_file_list
 
     fetch_result_list_max = []
     fetch_result_list_average = []
@@ -886,10 +870,6 @@ def handle_service_line_api(request,date,host,operator,compute,area,service_line
 #存储运营商月统计的流量数据_NEW
 def handle_api_new(request,date,host,operator,compute,area):
 
-    print date, host, operator, compute, area
-
-    print request.method
-
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
     da = [1, 3, 5, 7, 8, 10, 12]
@@ -916,152 +896,201 @@ def handle_api_new(request,date,host,operator,compute,area):
     host_list = host.split('+')
     operator_1 = '- ' + operator.encode('utf-8')
     area_s = area.encode('utf-8')
+    
+    #根据条件将所有的rrd文件进行汇总
+    try:
+        rrd_file_list = []
+        for item in host_list:
+            item_str = item.encode('utf-8')
 
-    rrd_file_list = []
-    for item in host_list:
-        item_str = item.encode('utf-8')
+            conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
+            cur = conn.cursor()
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
-        cur = conn.cursor()
-
-        sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
-            item_str, operator_1)
-        data = cur.execute(sql)
-        if data == 0:
-            continue
-        elif data == 1:
-            rrd = cur.fetchall()
-        elif data == 2:
-            rrd = cur.fetchall()
-
-        cur.close()
-        conn.close()
-
-        for item in rrd:
-            rrd_item = item.__str__()
-            rrd_file_path = rrd_item.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
-                ')').strip(',').strip("'").encode('utf-8')
-            if os.path.exists(rrd_file_path):
-                rrd_file_list.append(rrd_file_path)
-            else:
+            sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
+                item_str, operator_1)
+            data = cur.execute(sql)
+            if data == 0:
                 continue
+            elif data == 1:
+                rrd = cur.fetchall()
+            elif data == 2:
+                rrd = cur.fetchall()
 
-    # 通过rrdtool查询rrd数据
-    fetch_result_list = []
-    fetch_result_list_max = []
-    fetch_result_list_average = []
-    fetch_result_dict_max_count = {}
-    fetch_result_dict_average_count = {}
-    for item in rrd_file_list:
-        start_time_stamp_rrd = str('-s' + ' ' + start_timestamp)
-        end_time_stamp_rrd = str('-e' + ' ' + end_timestamp)
-        fetch_result_max = rrdtool.fetch(item, str('MAX'), start_time_stamp_rrd, end_time_stamp_rrd)
-        fetch_result_list_max.append(fetch_result_max)
-        fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), start_time_stamp_rrd, end_time_stamp_rrd)
-        fetch_result_list_average.append(fetch_result_average)
-        fetch_result_dict_max = {item: fetch_result_max}
-        fetch_result_dict_max_count.update(fetch_result_dict_max)
-        fetch_result_dict_average = {item: fetch_result_average}
-        fetch_result_dict_average_count.update(fetch_result_dict_average)
+            cur.close()
+            conn.close()
 
-    #将每个主机的流量添加到一个新的列表
-    traffic_count_list_max = []
-    for k, v in fetch_result_dict_max_count.items():
-        traffic_count_list_max.append(v[2])
-    traffic_count_list_average = []
-    for k, v in fetch_result_dict_average_count.items():
-        traffic_count_list_average.append(v[2])
+            for item in rrd:
+                rrd_item = item.__str__()
+                rrd_file_path = rrd_item.replace('<path_rra>', rrdpath).strip('(').strip(')').strip(',').strip("'").strip(
+                    ')').strip(',').strip("'").encode('utf-8')
+                if os.path.exists(rrd_file_path):
+                    rrd_file_list.append(rrd_file_path)
+                else:
+                    Logger_Error_File.exception('%s该rrd文件不存在' % (rrd_file_path))
+                    continue
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-    #每台主机列表的个数和总共的列表个数
-    list_num = len(traffic_count_list_max[0])
-    list_count_num = len(traffic_count_list_max)
+    try:
+        # 通过rrdtool查询rrd数据
+        fetch_result_list = []
+        fetch_result_list_max = []
+        fetch_result_list_average = []
+        fetch_result_dict_max_count = {}
+        fetch_result_dict_average_count = {}
+        for item in rrd_file_list:
+            start_time_stamp_rrd = str('-s' + ' ' + start_timestamp)
+            end_time_stamp_rrd = str('-e' + ' ' + end_timestamp)
+            fetch_result_max = rrdtool.fetch(item, str('MAX'), start_time_stamp_rrd, end_time_stamp_rrd)
+            fetch_result_list_max.append(fetch_result_max)
+            fetch_result_average = rrdtool.fetch(item, str('AVERAGE'), start_time_stamp_rrd, end_time_stamp_rrd)
+            fetch_result_list_average.append(fetch_result_average)
+            fetch_result_dict_max = {item: fetch_result_max}
+            fetch_result_dict_max_count.update(fetch_result_dict_max)
+            fetch_result_dict_average = {item: fetch_result_average}
+            fetch_result_dict_average_count.update(fetch_result_dict_average)
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-    #将进出流量的大值放到新的列表中
-    traffic_list_new_max = []
-    traffic_list_new2_max = []
-    for i in range(list_count_num):
-        for j in range(list_num):
-            traffic_in = traffic_count_list_max[i][j][0]
-            traffic_out = traffic_count_list_max[i][j][1]
-            if traffic_in is None and traffic_out is None:
-                traffic_list_new_max.append(float(0))
-            elif traffic_in > traffic_out:
-                traffic_list_new_max.append(traffic_in)
-            else:
-                traffic_list_new_max.append(traffic_out)
-            traffic_dit = {i: traffic_list_new_max}
+    try:
+        #将每个主机的流量添加到一个新的列表
+        traffic_count_list_max = []
+        for k, v in fetch_result_dict_max_count.items():
+            traffic_count_list_max.append(v[2])
+        traffic_count_list_average = []
+        for k, v in fetch_result_dict_average_count.items():
+            traffic_count_list_average.append(v[2])
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-        traffic_list_new2_max.append(traffic_dit)
+    try:
+        data_len_list = []
+        for item in range(len(traffic_count_list_max)):
+            data = len(traffic_count_list_max[item])
+            data_len_list.append(data)
+
+        def max_list(lt):
+            temp = 0
+            for i in lt:
+                if lt.count(i) > temp:
+                    max_str = i
+                    temp = lt.count(i)
+            return max_str
+
+        if len(traffic_count_list_max) == 1:
+            list_num = len(traffic_count_list_max[0])
+        else:
+            list_num = max_list(data_len_list)
+        # 总共的列表个数
+        list_count_num = len(traffic_count_list_max)
+    except Exception,e:
+        Logger_Error_File.exception(e)
+
+    try:
+        #将进出流量的大值放到新的列表中
         traffic_list_new_max = []
+        traffic_list_new2_max = []
+        for i in range(list_count_num):
+            for j in range(list_num):
+                traffic_in = traffic_count_list_max[i][j][0]
+                traffic_out = traffic_count_list_max[i][j][1]
+                if traffic_in is None and traffic_out is None:
+                    traffic_list_new_max.append(float(0))
+                elif traffic_in > traffic_out:
+                    traffic_list_new_max.append(traffic_in)
+                else:
+                    traffic_list_new_max.append(traffic_out)
+                traffic_dit = {i: traffic_list_new_max}
 
-    traffic_list_new_average = []
-    traffic_list_new2_average = []
-    for i in range(list_count_num):
-        for j in range(list_num):
-            traffic_in = traffic_count_list_average[i][j][0]
-            traffic_out = traffic_count_list_average[i][j][1]
-            if traffic_in is None and traffic_out is None:
-                traffic_list_new_average.append(float(0))
-            elif traffic_in > traffic_out:
-                traffic_list_new_average.append(traffic_in)
-            else:
-                traffic_list_new_average.append(traffic_out)
-            traffic_dit = {i: traffic_list_new_average}
+            traffic_list_new2_max.append(traffic_dit)
+            traffic_list_new_max = []
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-        traffic_list_new2_average.append(traffic_dit)
+    try:
         traffic_list_new_average = []
+        traffic_list_new2_average = []
+        for i in range(list_count_num):
+            for j in range(list_num):
+                traffic_in = traffic_count_list_average[i][j][0]
+                traffic_out = traffic_count_list_average[i][j][1]
+                if traffic_in is None and traffic_out is None:
+                    traffic_list_new_average.append(float(0))
+                elif traffic_in > traffic_out:
+                    traffic_list_new_average.append(traffic_in)
+                else:
+                    traffic_list_new_average.append(traffic_out)
+                traffic_dit = {i: traffic_list_new_average}
 
-    #按顺序将每台主机的同一行的数据放到一个新的列表
-    traffic_list_new3_max = []
-    traffic_list_new4_max = []
-    for i in range(list_num):
-        for j in range(list_count_num):
-            traffic_0 = traffic_list_new2_max[j][j][i]
-            traffic_list_new3_max.append(traffic_0)
-        traffic_dit2 = {i: traffic_list_new3_max}
+            traffic_list_new2_average.append(traffic_dit)
+            traffic_list_new_average = []
+    except Exception,e:
+        Logger_Error_File.exception(e)
+
+    try:
+        #按顺序将每台主机的同一行的数据放到一个新的列表
         traffic_list_new3_max = []
-        traffic_list_new4_max.append(traffic_dit2)
+        traffic_list_new4_max = []
+        for i in range(list_num):
+            for j in range(list_count_num):
+                traffic_0 = traffic_list_new2_max[j][j][i]
+                traffic_list_new3_max.append(traffic_0)
+            traffic_dit2 = {i: traffic_list_new3_max}
+            traffic_list_new3_max = []
+            traffic_list_new4_max.append(traffic_dit2)
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-    traffic_list_new3_average = []
-    traffic_list_new4_average = []
-    for i in range(list_num):
-        for j in range(list_count_num):
-            traffic_0 = traffic_list_new2_average[j][j][i]
-            traffic_list_new3_average.append(traffic_0)
-        traffic_dit2 = {i: traffic_list_new3_average}
+    try:
         traffic_list_new3_average = []
-        traffic_list_new4_average.append(traffic_dit2)
+        traffic_list_new4_average = []
+        for i in range(list_num):
+            for j in range(list_count_num):
+                traffic_0 = traffic_list_new2_average[j][j][i]
+                traffic_list_new3_average.append(traffic_0)
+            traffic_dit2 = {i: traffic_list_new3_average}
+            traffic_list_new3_average = []
+            traffic_list_new4_average.append(traffic_dit2)
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-    #将所有主机的同一条数据进行加运算后放到最终的列表中
-    traffic_list_new5_max = []
-    for i in range(list_num):
-        traffic_1 = traffic_list_new4_max[i][i]
-        traffic_1_sum = sum(traffic_1)
-        traffic_list_new5_max.append(traffic_1_sum)
+    try:
+        #将所有主机的同一条数据进行加运算后放到最终的列表中
+        traffic_list_new5_max = []
+        for i in range(list_num):
+            traffic_1 = traffic_list_new4_max[i][i]
+            traffic_1_sum = sum(traffic_1)
+            traffic_list_new5_max.append(traffic_1_sum)
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-    traffic_list_new5_average = []
-    for i in range(list_num):
-        traffic_1 = traffic_list_new4_average[i][i]
-        traffic_1_sum = sum(traffic_1)
-        traffic_list_new5_average.append(traffic_1_sum)
+    try:
+        traffic_list_new5_average = []
+        for i in range(list_num):
+            traffic_1 = traffic_list_new4_average[i][i]
+            traffic_1_sum = sum(traffic_1)
+            traffic_list_new5_average.append(traffic_1_sum)
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
-    #求流量的最大值
-    traffic_max = round(max(traffic_list_new5_max) * 8 / float(1024) / float(1024), 2)
-    #求流量的平均值
-    traffic_new5_sum = sum(traffic_list_new5_average)
-    traffic_new5_len = float(len(traffic_list_new5_average))
-    traffic_average = round(traffic_new5_sum / traffic_new5_len * 8 / float(1024) / float(1024), 2)
+    try:
+        #求流量的最大值
+        traffic_max = round(max(traffic_list_new5_max) * 8 / float(1024) / float(1024), 2)
+        #求流量的平均值
+        traffic_new5_sum = sum(traffic_list_new5_average)
+        traffic_new5_len = float(len(traffic_list_new5_average))
+        traffic_average = round(traffic_new5_sum / traffic_new5_len * 8 / float(1024) / float(1024), 2)
 
-    models.Operator_month_count.objects.create(operator=operator.encode('utf-8'), month=year_s + '/' + month_s,
-                                               max_value=traffic_max,
-                                               average_value=traffic_average, comment=area_s)
+        models.Operator_month_count.objects.create(operator=operator.encode('utf-8'), month=year_s + '/' + month_s,
+                                                   max_value=traffic_max,
+                                                   average_value=traffic_average, comment=area_s)
+    except Exception,e:
+        Logger_Error_File.exception(e)
 
     return HttpResponse('ok')
 
 #存储区域月统计的流量数据_NEW
 def handle_area_api_new(request,date,host,operator,compute,area):
-
-    print date,host,operator,compute,area
 
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
@@ -1094,7 +1123,7 @@ def handle_area_api_new(request,date,host,operator,compute,area):
     for item in host_list:
         item_str = item.encode('utf-8')
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor()
 
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
@@ -1145,9 +1174,22 @@ def handle_area_api_new(request,date,host,operator,compute,area):
     traffic_count_list_average = []
     for k, v in fetch_result_dict_average_count.items():
         traffic_count_list_average.append(v[2])
-
-    # 每台主机列表的个数和总共的列表个数
-    list_num = len(traffic_count_list_max[0])
+    data_len_list = []
+    for item in range(len(traffic_count_list_max)):
+        data = len(traffic_count_list_max[item])
+        data_len_list.append(data)
+    def max_list(lt):
+        temp = 0
+        for i in lt:
+            if lt.count(i) > temp:
+                max_str = i
+                temp = lt.count(i)
+        return max_str
+    if len(traffic_count_list_max) == 1:
+        list_num = len(traffic_count_list_max[0])
+    else:
+        list_num = max_list(data_len_list)
+    #总共的列表个数
     list_count_num = len(traffic_count_list_max)
 
     # 将进出流量的大值放到新的列表中
@@ -1233,8 +1275,6 @@ def handle_area_api_new(request,date,host,operator,compute,area):
 #存储业务线统计的流量数据_NEW
 def handle_service_line_api_new(request,date,host,operator,compute,area,service_line):
 
-    print date,host,operator,compute,area,service_line
-
     start_time_h = "00:00:00"
     end_time_h = "23:59:59"
     da = [1,3,5,7,8,10,12]
@@ -1267,7 +1307,7 @@ def handle_service_line_api_new(request,date,host,operator,compute,area,service_
     for item in host_list:
         item_str = item.encode('utf-8')
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor()
 
         sql = "select data_source_path from data_template_data where name_cache REGEXP 'Traffic' and name_cache REGEXP '{0}' and name_cache REGEXP '{1}'".format(
@@ -1318,11 +1358,25 @@ def handle_service_line_api_new(request,date,host,operator,compute,area,service_
     traffic_count_list_average = []
     for k, v in fetch_result_dict_average_count.items():
         traffic_count_list_average.append(v[2])
+    data_len_list = []
+    for item in range(len(traffic_count_list_max)):
+        data = len(traffic_count_list_max[item])
+        data_len_list.append(data)
 
-    # 每台主机列表的个数和总共的列表个数
-    list_num = len(traffic_count_list_max[0])
+    def max_list(lt):
+        temp = 0
+        for i in lt:
+            if lt.count(i) > temp:
+                max_str = i
+                temp = lt.count(i)
+        return max_str
+
+    if len(traffic_count_list_max) == 1:
+        list_num = len(traffic_count_list_max[0])
+    else:
+        list_num = max_list(data_len_list)
+    # 总共的列表个数
     list_count_num = len(traffic_count_list_max)
-
     # 将进出流量的大值放到新的列表中
     traffic_list_new_max = []
     traffic_list_new2_max = []

@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-
 from django.shortcuts import render,render_to_response
-
 # Create your views here.
 from django.http.response import HttpResponse
 from django.core import serializers
@@ -10,6 +8,13 @@ from statistics import models
 import json
 import os
 import MySQLdb
+from Traffic_Statistics.settings import DATABASES
+#配置数据库的相应变量
+DB_HOST = DATABASES['default']['HOST']
+DB_PORT = int(DATABASES['default']['PORT'])
+DB_USER = DATABASES['default']['USER']
+DB_PASSWORD = DATABASES['default']['PASSWORD']
+DB_DATABASE = DATABASES['default']['NAME']
 
 #查询页面请求的运营商统计数据
 def get_operator_data(reuqest):
@@ -372,11 +377,6 @@ def get_service_line_api_data(request):
                 test_LT_average_data = item['fields']['average_value']
                 LT_max_count_list.append(test_LT_max_data)
                 LT_average_count_list.append(test_LT_average_data)
-            elif item_operator_data == 'LT' and item_service_line_data == 'usercenter':
-                usercenter_LT_max_data = item['fields']['max_value']
-                usercenter_LT_average_data = item['fields']['average_value']
-                LT_max_count_list.append(usercenter_LT_max_data)
-                LT_average_count_list.append(usercenter_LT_average_data)
             elif item_operator_data == 'LT' and item_service_line_data == 'website':
                 website_LT_max_data = item['fields']['max_value']
                 website_LT_average_data = item['fields']['average_value']
@@ -407,11 +407,6 @@ def get_service_line_api_data(request):
                 test_DX_average_data = item['fields']['average_value']
                 DX_max_count_list.append(test_DX_max_data)
                 DX_average_count_list.append(test_DX_average_data)
-            elif item_operator_data == 'DX' and item_service_line_data == 'usercenter':
-                usercenter_DX_max_data = item['fields']['max_value']
-                usercenter_DX_average_data = item['fields']['average_value']
-                DX_max_count_list.append(usercenter_DX_max_data)
-                DX_average_count_list.append(usercenter_DX_average_data)
             elif item_operator_data == 'DX' and item_service_line_data == 'website':
                 website_DX_max_data = item['fields']['max_value']
                 website_DX_average_data = item['fields']['average_value']
@@ -442,11 +437,6 @@ def get_service_line_api_data(request):
                 test_YD_average_data = item['fields']['average_value']
                 YD_max_count_list.append(test_YD_max_data)
                 YD_average_count_list.append(test_YD_average_data)
-            elif item_operator_data == 'YD' and item_service_line_data == 'usercenter':
-                usercenter_YD_max_data = item['fields']['max_value']
-                usercenter_YD_average_data = item['fields']['average_value']
-                YD_max_count_list.append(usercenter_YD_max_data)
-                YD_average_count_list.append(usercenter_YD_average_data)
             elif item_operator_data == 'YD' and item_service_line_data == 'website':
                 website_YD_max_data = item['fields']['max_value']
                 website_YD_average_data = item['fields']['average_value']
@@ -487,13 +477,11 @@ def get_service_line_api_data(request):
         LT_cdn_average_percent = round(cdn_LT_average_data / sum(LT_average_count_list) * 100, 2)
         LT_test_max_percent = round(test_LT_max_data / sum(LT_max_count_list) * 100, 2)
         LT_test_average_percent = round(test_LT_average_data / sum(LT_average_count_list) * 100, 2)
-        LT_usercenter_max_percent = round(usercenter_LT_max_data / sum(LT_max_count_list) * 100, 2)
-        LT_usercenter_average_percent = round(usercenter_LT_average_data / sum(LT_average_count_list) * 100, 2)
         LT_website_max_percent = round(website_LT_max_data / sum(LT_max_count_list) * 100, 2)
         LT_website_average_percent = round(website_LT_average_data / sum(LT_average_count_list) * 100, 2)
         LT_cloudstorage_max_percent = round(cloudstorage_LT_max_data / sum(LT_max_count_list) * 100, 2)
         LT_cloudstorage_average_percent = round(cloudstorage_LT_average_data / sum(LT_average_count_list) * 100, 2)
-        LT_dit = {"LT_ptop_max_percent":LT_ptop_max_percent,"LT_ptop_average_percent":LT_ptop_average_percent,"LT_meeting_max_percent":LT_meeting_max_percent,"LT_meeting_average_percent":LT_meeting_average_percent,"LT_cdn_max_percent":LT_cdn_max_percent,"LT_cdn_average_percent":LT_cdn_average_percent,"LT_test_max_percent":LT_test_max_percent,"LT_test_average_percent":LT_test_average_percent,"LT_usercenter_max_percent":LT_usercenter_max_percent,"LT_usercenter_average_percent":LT_usercenter_average_percent,"LT_website_max_percent":LT_website_max_percent,"LT_website_average_percent":LT_website_average_percent,"LT_cloudstorage_max_percent":LT_cloudstorage_max_percent,"LT_cloudstorage_average_percent":LT_cloudstorage_average_percent}
+        LT_dit = {"LT_ptop_max_percent":LT_ptop_max_percent,"LT_ptop_average_percent":LT_ptop_average_percent,"LT_meeting_max_percent":LT_meeting_max_percent,"LT_meeting_average_percent":LT_meeting_average_percent,"LT_cdn_max_percent":LT_cdn_max_percent,"LT_cdn_average_percent":LT_cdn_average_percent,"LT_test_max_percent":LT_test_max_percent,"LT_test_average_percent":LT_test_average_percent,"LT_website_max_percent":LT_website_max_percent,"LT_website_average_percent":LT_website_average_percent,"LT_cloudstorage_max_percent":LT_cloudstorage_max_percent,"LT_cloudstorage_average_percent":LT_cloudstorage_average_percent}
         data_dit.update(LT_dit)
     if len(DX_max_count_list) == 0 or len(DX_average_count_list) == 0:
         data_dit['DX_data'] = 'null'
@@ -506,13 +494,11 @@ def get_service_line_api_data(request):
         DX_cdn_average_percent = round(cdn_DX_average_data / sum(DX_average_count_list) * 100, 2)
         DX_test_max_percent = round(test_DX_max_data / sum(DX_max_count_list) * 100, 2)
         DX_test_average_percent = round(test_DX_average_data / sum(DX_average_count_list) * 100, 2)
-        DX_usercenter_max_percent = round(usercenter_DX_max_data / sum(DX_max_count_list) * 100, 2)
-        DX_usercenter_average_percent = round(usercenter_DX_average_data / sum(DX_average_count_list) * 100, 2)
         DX_website_max_percent = round(website_DX_max_data / sum(DX_max_count_list) * 100, 2)
         DX_website_average_percent = round(website_DX_average_data / sum(DX_average_count_list) * 100, 2)
         DX_cloudstorage_max_percent = round(cloudstorage_DX_max_data / sum(DX_max_count_list) * 100, 2)
         DX_cloudstorage_average_percent = round(cloudstorage_DX_average_data / sum(DX_average_count_list) * 100, 2)
-        DX_dit = {"DX_ptop_max_percent":DX_ptop_max_percent,"DX_ptop_average_percent":DX_ptop_average_percent,"DX_meeting_max_percent":DX_meeting_max_percent,"DX_meeting_average_percent":DX_meeting_average_percent,"DX_cdn_max_percent":DX_cdn_max_percent,"DX_cdn_average_percent":DX_cdn_average_percent,"DX_test_max_percent":DX_test_max_percent,"DX_test_average_percent":DX_test_average_percent,"DX_usercenter_max_percent":DX_usercenter_max_percent,"DX_usercenter_average_percent":DX_usercenter_average_percent,"DX_website_max_percent":DX_website_max_percent,"DX_website_average_percent":DX_website_average_percent,"DX_cloudstorage_max_percent":DX_cloudstorage_max_percent,"DX_cloudstorage_average_percent":DX_cloudstorage_average_percent}
+        DX_dit = {"DX_ptop_max_percent":DX_ptop_max_percent,"DX_ptop_average_percent":DX_ptop_average_percent,"DX_meeting_max_percent":DX_meeting_max_percent,"DX_meeting_average_percent":DX_meeting_average_percent,"DX_cdn_max_percent":DX_cdn_max_percent,"DX_cdn_average_percent":DX_cdn_average_percent,"DX_test_max_percent":DX_test_max_percent,"DX_test_average_percent":DX_test_average_percent,"DX_website_max_percent":DX_website_max_percent,"DX_website_average_percent":DX_website_average_percent,"DX_cloudstorage_max_percent":DX_cloudstorage_max_percent,"DX_cloudstorage_average_percent":DX_cloudstorage_average_percent}
         data_dit.update(DX_dit)
     if len(YD_max_count_list) == 0 or len(YD_average_count_list) == 0:
         data_dit['YD_data'] = 'null'
@@ -525,11 +511,9 @@ def get_service_line_api_data(request):
         YD_cdn_average_percent = round(cdn_YD_average_data / sum(YD_average_count_list) * 100, 2)
         YD_test_max_percent = round(test_YD_max_data / sum(YD_max_count_list) * 100, 2)
         YD_test_average_percent = round(test_YD_average_data / sum(YD_average_count_list) * 100, 2)
-        YD_usercenter_max_percent = round(usercenter_YD_max_data / sum(YD_max_count_list) * 100, 2)
-        YD_usercenter_average_percent = round(usercenter_YD_average_data / sum(YD_average_count_list) * 100, 2)
         YD_website_max_percent = round(website_YD_max_data / sum(YD_max_count_list) * 100, 2)
         YD_website_average_percent = round(website_YD_average_data / sum(YD_average_count_list) * 100, 2)
-        YD_dit = {"YD_ptop_max_percent":YD_ptop_max_percent,"YD_ptop_average_percent":YD_ptop_average_percent,"YD_meeting_max_percent":YD_meeting_max_percent,"YD_meeting_average_percent":YD_meeting_average_percent,"YD_cdn_max_percent":YD_cdn_max_percent,"YD_cdn_average_percent":YD_cdn_average_percent,"YD_test_max_percent":YD_test_max_percent,"YD_test_average_percent":YD_test_average_percent,"YD_usercenter_max_percent":YD_usercenter_max_percent,"YD_usercenter_average_percent":YD_usercenter_average_percent,"YD_website_max_percent":YD_website_max_percent,"YD_website_average_percent":YD_website_average_percent}
+        YD_dit = {"YD_ptop_max_percent":YD_ptop_max_percent,"YD_ptop_average_percent":YD_ptop_average_percent,"YD_meeting_max_percent":YD_meeting_max_percent,"YD_meeting_average_percent":YD_meeting_average_percent,"YD_cdn_max_percent":YD_cdn_max_percent,"YD_cdn_average_percent":YD_cdn_average_percent,"YD_test_max_percent":YD_test_max_percent,"YD_test_average_percent":YD_test_average_percent,"YD_website_max_percent":YD_website_max_percent,"YD_website_average_percent":YD_website_average_percent}
         data_dit.update(YD_dit)
 
     return HttpResponse(json.dumps(data_dit))
@@ -574,7 +558,7 @@ def get_group_to_host_list(request):
         group_name_id_json = json.loads(group_name_id_s)
         group_name_id_only = group_name_id_json[0]['pk']
 
-        conn = MySQLdb.connect(host='192.168.137.1', port=3306, user='root', passwd='123456', db='cacti')
+        conn = MySQLdb.connect(host=DB_HOST, port=DB_PORT, user=DB_USER, passwd=DB_PASSWORD, db=DB_DATABASE)
         cur = conn.cursor(cursorclass=MySQLdb.cursors.DictCursor)
 
         sql = 'select description from host where group_id = %s'
