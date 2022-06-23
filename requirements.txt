@@ -15,7 +15,7 @@ pytz==2018.4
 PyYAML==3.12
 pyzmq==17.0.0
 requests==2.18.4
-salt==2018.3.0
+salt==3002.7
 singledispatch==3.4.0.3
 six==1.11.0
 tornado==4.5.3
